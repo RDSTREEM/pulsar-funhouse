@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
@@ -54,7 +53,7 @@ export default function Pictionary() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const drawing = useRef(false);
-  const subscriptionRef = useRef<any>(null);
+  const subscriptionRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const chatInputRef = useRef<HTMLInputElement | null>(null);
 
 
@@ -107,7 +106,7 @@ export default function Pictionary() {
     return () => {
       if (subscriptionRef.current) supabase.removeChannel(subscriptionRef.current);
     };
-  }, [room, user]);
+  }, [room, user, loadPlayers, loadChat, loadDrawingActions]);
 
 
   async function loadPlayers() {
@@ -125,7 +124,7 @@ export default function Pictionary() {
   async function loadDrawingActions() {
     if (!room) return;
     const { data } = await supabase.from('drawing_actions').select().eq('room_id', room.id).order('created_at');
-    setDrawingActions((data || []).map((d: any) => d.action));
+    setDrawingActions((data || []).map((d: { action: DrawingAction }) => d.action));
   }
 
   // Create a room
@@ -189,7 +188,7 @@ export default function Pictionary() {
     ctxRef.current = ctx;
 
     redraw();
-  }, [drawingActions]);
+  }, [drawingActions, redraw]);
 
 
   function redraw() {

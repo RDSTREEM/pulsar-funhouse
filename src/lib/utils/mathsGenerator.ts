@@ -25,7 +25,7 @@ export function generateMathQuestion(difficulty = 'easy') {
 
   if (op === '/') b = b === 0 ? 1 : b
 
-  let question = `${a} ${op} ${b}`
+  const question = `${a} ${op} ${b}`
   let answer
 
   try {

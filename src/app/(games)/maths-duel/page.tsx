@@ -40,7 +40,7 @@ export default function Home() {
   const [input, setInput] = useState<string>('')
   const [score, setScore] = useState<number>(0)
   const [gameStatus, setGameStatus] = useState<string>('waiting')
-  const subscriptionRef = useRef<any>(null)
+  const subscriptionRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -81,7 +81,7 @@ export default function Home() {
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'games', filter: `status=eq.active` },
-          (payload: { new?: any }) => {
+          (payload: { new?: { id?: string } }) => {
             if (payload.new && payload.new.id) {
               checkIfInGame(payload.new.id)
             }
@@ -112,13 +112,6 @@ export default function Home() {
   async function loadPlayers(gameId: string) {
     const { data: ps } = await supabase.from('players').select().eq('game_id', gameId)
     setPlayers(ps ?? [])
-  }
-
-  async function signIn() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'github',
-    })
-    if (error) alert(error.message)
   }
 
   async function signOut() {
@@ -257,7 +250,7 @@ export default function Home() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'games', filter: `id=eq.${game.id}` },
-        (payload: { new?: any }) => {
+        (payload: { new?: { status?: string } }) => {
           if (payload.new && payload.new.status) setGameStatus(payload.new.status)
         }
       )
