@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface GameCardProps {
   name: string;
@@ -13,7 +14,7 @@ const GameCard: React.FC<GameCardProps> = ({ name, description, url, image }) =>
     <div className="bg-gray-900 rounded-lg shadow-md p-6 flex flex-col justify-between hover:shadow-xl transition-shadow duration-200 w-72 h-80 border border-gray-800">
       <div>
         {image ? (
-          <img
+          <Image
             src={image}
             alt={name}
             className="w-full h-32 object-cover rounded mb-4"

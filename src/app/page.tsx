@@ -2,8 +2,16 @@
 import GameCard from "../components/GameCard";
 import { useEffect, useState } from "react";
 
+type Game = {
+  slug: string;
+  name: string;
+  description: string;
+  url: string;
+  image: string;
+};
+
 export default function Home() {
-  const [games, setGames] = useState<any[]>([]);
+  const [games, setGames] = useState<Game[]>([]);
 
   useEffect(() => {
     fetch("/games.json")
