@@ -16,5 +16,11 @@
     "slug": "gebeta",
     "description": "Traditional Ethiopian game",
     "url": "/gebeta"
+  },
+  {
+    "name": "Rock Customizer",
+    "slug": "rock-customizer",
+    "description": "An over-engineered rock pet customizer",
+    "url": "/rock-customizer"
   }
 ]
