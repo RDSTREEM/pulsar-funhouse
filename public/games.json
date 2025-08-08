@@ -22,7 +22,8 @@
     "name": "Typing Test",
     "slug": "typing-test",
     "description": "Test your typing speed and accuracy",
-    "url": "/typing-test"},{    
+    "url": "/typing-test"},
+    {    
     "name": "Math Duel",
     "slug": "maths-duel",
     "description": "Race against others and see who can solve maths questions faster",
