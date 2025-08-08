@@ -7,16 +7,20 @@ type Game = {
   name: string;
   description: string;
   url: string;
-  image: string;
+  image?: string;
+  badge?: string;
 };
 
 export default function Home() {
   const [games, setGames] = useState<Game[]>([]);
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
   useEffect(() => {
     fetch("/games.json")
       .then((res) => res.json())
       .then((data) => setGames(data));
+    // Example login check: replace with your actual logic
+    setLoggedIn(!!localStorage.getItem("sb-access-token"));
   }, []);
 
   return (
@@ -31,6 +35,8 @@ export default function Home() {
             description={game.description}
             url={game.url}
             image={game.image}
+            badge={game.badge}
+            loggedIn={loggedIn}
           />
         ))}
       </div>
