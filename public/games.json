@@ -16,5 +16,12 @@
     "slug": "gebeta",
     "description": "Traditional Ethiopian game",
     "url": "/gebeta"
+  },
+  {
+    "name": "Typing Test",
+    "slug": "typing-test",
+    "description": "Test your typing speed and accuracy",
+    "url": "/typing-test"
   }
 ]
+
