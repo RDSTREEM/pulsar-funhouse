@@ -27,7 +27,12 @@ function getDailyIndex() {
   return today.getDate() % 3;
 }
 
-export default function DailySection({ streak, onPuzzleSolved }) {
+interface DailySectionProps {
+  streak: number;
+  onPuzzleSolved: () => void;
+}
+
+export default function DailySection({ streak, onPuzzleSolved }: DailySectionProps) {
   const [fact, setFact] = useState("");
   const [quote, setQuote] = useState("");
   const [puzzle, setPuzzle] = useState({ type: "riddle", question: "", answer: "" });
