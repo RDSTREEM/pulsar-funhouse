@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Rock Paper Scissors",
+    "slug": "rock-paper-scissors",
+    "description": "Classic game with a modern UI.",
+    "url": "/rock-paper-scissors"
+  },
+  {
+    "name": "Tic Tac Toe",
+    "slug": "tic-tac-toe",
+    "description": "Play against a friend or challenge yourself.",
+    "url": "/tic-tac-toe"
+  },
+  {
+    "name": "Gebeta",
+    "slug": "gebeta",
+    "description": "Traditional Ethiopian game",
+    "url": "/gebeta"
+  }
+]
