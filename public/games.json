@@ -23,5 +23,12 @@
     "description": "Race against others and see who can solve maths questions faster",
     "url": "/maths-duel",
     "badge": "Requires Login"
+  },
+  {
+    "name": "Pictonary",
+    "slug": "pictonary",
+    "description": "Draw while the rest try to guess",
+    "url": "/pictonary",
+    "badge": "Requires Login"
   }
 ]
