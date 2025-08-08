@@ -70,6 +70,7 @@ export default function GebetaBoard() {
     }
 
     if (captured > 0) {
+      newScores = [...newScores];
       newScores[current] += captured;
     }
 

@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import type { User } from "@supabase/supabase-js";
 
 export default function Navbar() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -26,12 +27,9 @@ export default function Navbar() {
   return (
     <nav className="flex items-center justify-between p-4 bg-gray-900">
       <Link href="/" className="text-xl font-bold text-white">
-        🎮 Funhouse
+        Pulsar
       </Link>
       <div className="flex items-center gap-4">
-        <Link href="/tic-tac-toe">Tic Tac Toe</Link>
-        <Link href="/rock-paper-scissors">RPS</Link>
-        <Link href="/leaderboard">🏆 Leaderboard</Link>
         {user ? (
           <>
             <span className="text-sm text-gray-400">Hi, {user.email}</span>
