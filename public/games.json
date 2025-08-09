@@ -54,5 +54,10 @@
     "slug":"flappy-bird",
     "description":"A simple flappy bird game",
     "url":"/flappy_bird"
+  },{
+    "name":"Truth or Tech",
+    "slug":"truth_or_tech",
+    "description":"Chat, guess if AI or human, score points!",
+    "url":"/truth_or_tech"
   }
 ]
