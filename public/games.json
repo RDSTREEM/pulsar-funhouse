@@ -43,5 +43,11 @@
     "description": "Sing along to your favorite songs",
     "url": "/kareoke",
     "badge": "Requires Login"
+  },
+  {
+    "name": "Two Cars",
+    "slug": "two-cars",
+    "description": "Sing along to your favorite songs",
+    "url": "/two-cars"
   }
 ]
