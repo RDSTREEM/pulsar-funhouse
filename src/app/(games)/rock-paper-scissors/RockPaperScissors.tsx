@@ -1,95 +1,259 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
-import { submitWinStreak } from "@/lib/utils/submitWinStreak";
-import type { User } from "@supabase/supabase-js";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { SparklesIcon } from '@heroicons/react/24/solid';
 
-const choices = ["Rock", "Paper", "Scissors"] as const;
-type Choice = typeof choices[number];
 
-function getRandomChoice(): Choice {
-  return choices[Math.floor(Math.random() * choices.length)];
+const GEMINI_API = `${process.env.NEXT_PUBLIC_GEMINI_API_URL}=${process.env.NEXT_PUBLIC_GEMINI_API_KEY}`;
+
+async function judgeMove(prevMove: string, newMove: string) {
+  // Prompt Gemini to judge if newMove beats prevMove
+  const prompt = `You are an impartial judge in a creative battle game. The previous move was "${prevMove}". The user now claims "${newMove}" beats it. Respond ONLY with a valid JSON object (no markdown, no code block, no explanation). The object should have two fields: 'result' (true if the new move beats the previous, false otherwise) and 'reason' (a short, witty, or logical reason for your decision). Example: {"result": true, "reason": "A nuke obliterates scissors."}`;
+  const body = {
+    contents: [{ parts: [{ text: prompt }] }]
+  };
+  if (!GEMINI_API) throw new Error("GEMINI_API environment variable is not defined.");
+  const res = await fetch(GEMINI_API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  let text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  if (text.startsWith('```json')) {
+    text = text.replace(/^```json\s*/, '').replace(/```$/, '').trim();
+  } else if (text.startsWith('```')) {
+    text = text.replace(/^```\s*/, '').replace(/```$/, '').trim();
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { result: false, reason: "AI glitched! Try again." };
+  }
 }
 
-function getResult(player: Choice, cpu: Choice): string {
-  if (player === cpu) return "Draw!";
-  if (
-    (player === "Rock" && cpu === "Scissors") ||
-    (player === "Paper" && cpu === "Rock") ||
-    (player === "Scissors" && cpu === "Paper")
-  )
-    return "You win!";
-  return "You lose!";
-}
+
 
 export default function RockPaperScissors() {
-  const [playerChoice, setPlayerChoice] = useState<Choice | null>(null);
-  const [cpuChoice, setCpuChoice] = useState<Choice | null>(null);
-  const [result, setResult] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [winStreak, setWinStreak] = useState(0);
+  const [moves, setMoves] = useState<string[]>([]); // history of user moves
+  const [userMove, setUserMove] = useState("");
+  const [judgement, setJudgement] = useState<string>("");
+  const [reason, setReason] = useState<string>("");
+  const [gameOver, setGameOver] = useState(false);
+  const [inputDisabled, setInputDisabled] = useState(false);
 
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-  }, []);
-
-  function handleClick(choice: Choice) {
-    const cpu = getRandomChoice();
-    setPlayerChoice(choice);
-    setCpuChoice(cpu);
-    const res = getResult(choice, cpu);
-    setResult(res);
-    if (user) {
-      if (res === "You win!") {
-        setWinStreak((prev) => {
-          const newStreak = prev + 1;
-          submitWinStreak("rock-paper-scissors", user, newStreak);
-          return newStreak;
-        });
-      } else {
-        setWinStreak(0);
-      }
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!userMove.trim()) return;
+    setInputDisabled(true);
+    if (moves.length === 0) {
+      // First move, no judgement needed
+      setMoves([userMove]);
+      setJudgement("");
+      setReason("");
+      setUserMove("");
+      setInputDisabled(false);
+      return;
     }
+    // Judge if userMove beats previous move
+    const prevMove = moves[moves.length - 1];
+    const ai = await judgeMove(prevMove, userMove);
+    setJudgement(ai.result ? "Success!" : "Failed!");
+    setReason(ai.reason);
+    setMoves([...moves, userMove]);
+    setUserMove("");
+    if (!ai.result) setGameOver(true);
+    setInputDisabled(false);
   }
 
-  function reset() {
-    setPlayerChoice(null);
-    setCpuChoice(null);
-    setResult(null);
+  function resetGame() {
+    setMoves([]);
+    setJudgement("");
+    setReason("");
+    setGameOver(false);
+    setUserMove("");
+    setInputDisabled(false);
   }
 
   return (
-    <div className="text-center">
-      <h1 className="text-2xl font-bold mb-4">Rock Paper Scissors</h1>
-      <div className="flex justify-center gap-4 mb-4">
-        {choices.map((choice) => (
-          <button
-            key={choice}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
-            onClick={() => handleClick(choice)}
-          >
-            {choice}
-          </button>
-        ))}
-      </div>
+    <motion.div
+      className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 px-4 py-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.div
+        className="relative bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-full max-w-xl flex flex-col items-center border-2 border-purple-700/40"
+        initial={{ scale: 0.9, y: 40, opacity: 0 }}
+        animate={{ scale: 1, y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 120 }}
+      >
+        <motion.div
+          className="absolute -top-8 left-1/2 -translate-x-1/2 flex gap-2"
+          initial={{ opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <SparklesIcon className="w-10 h-10 text-pink-500 animate-pulse" />
+          <SparklesIcon className="w-10 h-10 text-purple-500 animate-pulse" />
+        </motion.div>
+        <motion.h1
+          className="text-5xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400 drop-shadow-lg"
+          initial={{ y: -30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+        >
+          Ultimate Creative Battle
+        </motion.h1>
+        <motion.p
+          className="mb-6 text-lg text-gray-300"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          Input anything. Next, try to input something that beats your previous move.<br />
+          <span className="text-pink-400 font-bold">The AI will judge your creativity!</span>
+        </motion.p>
 
-      {result && (
-        <div className="mt-4 text-lg">
-          <p className="mb-2">You chose: {playerChoice}</p>
-          <p className="mb-2">CPU chose: {cpuChoice}</p>
-          <p className="font-semibold">{result}</p>
-          <button
-            onClick={reset}
-            className="mt-4 px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded"
-          >
-            Play Again
-          </button>
-        </div>
-      )}
-      {user && (
-        <div className="mt-2 text-blue-600">Your win streak: {winStreak}</div>
-      )}
-    </div>
+        <AnimatePresence>
+          {!gameOver && (
+            <motion.form
+              onSubmit={handleSubmit}
+              className="mb-6 w-full flex justify-center gap-2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+            >
+              <motion.input
+                type="text"
+                value={userMove}
+                onChange={e => setUserMove(e.target.value)}
+                className="px-5 py-3 border-2 border-pink-400/60 rounded-xl w-64 text-lg focus:outline-none focus:ring-2 focus:ring-purple-400 bg-gray-950 text-white shadow-lg placeholder:text-gray-500 animate-[wiggle_1.5s_ease-in-out_infinite]"
+                placeholder={moves.length === 0 ? "Start with any move!" : `Your move to beat \"${moves[moves.length-1]}\"`}
+                disabled={inputDisabled}
+                whileFocus={{ scale: 1.05 }}
+              />
+              <motion.button
+                type="submit"
+                className="px-5 py-3 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white font-bold rounded-xl shadow-lg hover:scale-105 transition-transform border-2 border-purple-700/40 animate-[bounce_1.2s_infinite]"
+                disabled={inputDisabled}
+                whileHover={{ scale: 1.12, rotate: 2 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                Submit
+              </motion.button>
+            </motion.form>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {judgement && (
+            <motion.div
+              className="mb-4 flex flex-col items-center"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <motion.span
+                className={judgement === "Success!" ? "text-green-400 font-extrabold text-2xl animate-[tada_1s]" : "text-red-400 font-extrabold text-2xl animate-[shake_0.7s]"}
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 200 }}
+              >
+                {judgement}
+              </motion.span>
+              <motion.span
+                className="ml-2 italic text-gray-400 text-base mt-1 animate-[fadeIn_1.2s]"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1 }}
+              >
+                {reason}
+              </motion.span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {gameOver && (
+            <motion.div
+              className="mt-4 text-lg flex flex-col items-center"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+            >
+              <motion.p
+                className="font-semibold text-red-400 text-3xl animate-[shake_0.7s]"
+                initial={{ y: -10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+              >
+                Game Over!
+              </motion.p>
+              <motion.button
+                onClick={resetGame}
+                className="mt-4 px-6 py-3 bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-800 hover:to-gray-950 text-white rounded-xl font-bold shadow-lg animate-[bounce_1.2s_infinite]"
+                whileHover={{ scale: 1.07, rotate: -2 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                Play Again
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <motion.div
+          className="mt-8 text-left w-full"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <h2 className="font-bold mb-3 text-xl text-pink-400 drop-shadow">Move History</h2>
+          <ul className="list-none pl-0">
+            <AnimatePresence>
+              {moves.map((move, i) => (
+                <motion.li
+                  key={i}
+                  className="mb-2 flex items-center gap-2 animate-[fadeIn_0.7s]"
+                  initial={{ x: -30, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -30, opacity: 0 }}
+                  transition={{ type: "spring", stiffness: 150 }}
+                >
+                  <span className="font-semibold text-purple-400">{i === 0 ? "Start:" : `Move ${i}:`}</span>
+                  <span className="text-gray-200">{move}</span>
+                </motion.li>
+              ))}
+            </AnimatePresence>
+          </ul>
+        </motion.div>
+      </motion.div>
+      <style jsx global>{`
+        @keyframes wiggle {
+          0%, 100% { transform: rotate(-2deg); }
+          50% { transform: rotate(2deg); }
+        }
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes tada {
+          0% { transform: scale(1); }
+          10%, 20% { transform: scale(0.9) rotate(-3deg); }
+          30%, 50%, 70%, 90% { transform: scale(1.1) rotate(3deg); }
+          40%, 60%, 80% { transform: scale(1.1) rotate(-3deg); }
+          100% { transform: scale(1) rotate(0); }
+        }
+        @keyframes shake {
+          0% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+          20%, 40%, 60%, 80% { transform: translateX(8px); }
+          100% { transform: translateX(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
+    </motion.div>
   );
 }
+

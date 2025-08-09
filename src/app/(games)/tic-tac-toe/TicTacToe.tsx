@@ -10,7 +10,6 @@ function TicTacToe() {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isXNext, setIsXNext] = useState(true);
   const [user, setUser] = useState<User | null>(null);
-  const [winStreak, setWinStreak] = useState(0);
   const [lastWinner, setLastWinner] = useState<string | null>(null);
 
   useEffect(() => {
@@ -23,19 +22,10 @@ function TicTacToe() {
     if (winner && user) {
       // Only count streak for logged-in user playing as X
       if (winner === "X") {
-        if (lastWinner === "X") {
-          setWinStreak((prev) => prev + 1);
-        } else {
-          setWinStreak(1);
-        }
-        submitWinStreak("tic-tac-toe", user, winStreak + 1);
-      } else {
-        setWinStreak(0);
-      }
+  }
       setLastWinner(winner);
     }
     if (!winner && board.every(Boolean)) {
-      setWinStreak(0);
       setLastWinner(null);
     }
   }, [winner, user]);
@@ -70,9 +60,6 @@ function TicTacToe() {
           ? "It's a draw!"
           : `Turn: ${isXNext ? "X" : "O"}`}
       </div>
-      {user && (
-        <div className="mt-2 text-blue-600">Your win streak: {winStreak}</div>
-      )}
       <button
         className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
         onClick={resetGame}
