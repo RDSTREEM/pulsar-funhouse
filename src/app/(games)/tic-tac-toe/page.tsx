@@ -11,22 +11,6 @@ const variants = [
   {
     name: "Vsauce's Super Tic Tac Toe",
     component: dynamic(() => import("./SuperTicTacToe"), { ssr: false })
-  },
-  {
-    name: "Oats Jenkins Tik Oat Toe",
-    component: dynamic(() => import("./TikOatToe"), { ssr: false })
-  },
-  {
-    name: "Misère Tic Tac Toe",
-    component: dynamic(() => import("./MisereTicTacToe"), { ssr: false })
-  },
-  {
-    name: "Wild Tic Tac Toe",
-    component: dynamic(() => import("./WildTicTacToe"), { ssr: false })
-  },
-  {
-    name: "Randomized Board Tic Tac Toe",
-    component: dynamic(() => import("./RandomTicTacToe"), { ssr: false })
   }
 ];
 

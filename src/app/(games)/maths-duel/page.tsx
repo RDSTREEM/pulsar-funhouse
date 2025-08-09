@@ -6,10 +6,11 @@ type User = {
   email?: string;
 };
 
+type GameStatus = 'waiting' | 'active' | 'finished';
 type Game = {
   id: string;
   difficulty?: string;
-  status?: string;
+  status?: GameStatus;
 };
 
 type Player = {
@@ -39,7 +40,9 @@ export default function Home() {
   const [question, setQuestion] = useState<Question | null>(null)
   const [input, setInput] = useState<string>('')
   const [score, setScore] = useState<number>(0)
-  const [gameStatus, setGameStatus] = useState<string>('waiting')
+  const [winner, setWinner] = useState<string | null>(null)
+  const WINNING_SCORE = 10;
+  const [gameStatus, setGameStatus] = useState<GameStatus>('waiting')
   const subscriptionRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
 
   useEffect(() => {
@@ -214,23 +217,25 @@ export default function Home() {
     if (!question) return
 
     if (Math.abs(parseFloat(input) - parseFloat(String(question.answer))) < 0.01) {
-      alert('Correct!')
-
       const player = players.find((p) => user && p.user_id === user.id)
       if (!player) return
-
       const newScore = (player.score || 0) + 1
-      setScore(newScore)
-
       await supabase.from('players').update({ score: newScore }).eq('id', player.id)
-
-      if (game) loadPlayers(game.id)
-
-      if (game) startNewQuestion()
+      if (game) await loadPlayers(game.id)
+      setScore(newScore)
+      // Check for win condition
+      if (newScore >= WINNING_SCORE) {
+        setWinner(player.username);
+        setGameStatus('finished');
+        if (game) {
+          await supabase.from('games').update({ status: 'finished' }).eq('id', game.id);
+        }
+      } else {
+        if (game) startNewQuestion();
+      }
     } else {
       alert('Wrong answer, try again.')
     }
-
     setInput('')
   }
 
@@ -252,7 +257,9 @@ export default function Home() {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'games', filter: `id=eq.${game.id}` },
         (payload: { new?: { status?: string } }) => {
-          if (payload.new && payload.new.status) setGameStatus(payload.new.status)
+          if (payload.new && payload.new.status && ['waiting','active','finished'].includes(payload.new.status)) {
+            setGameStatus(payload.new.status as GameStatus);
+          }
         }
       )
       .subscribe()
@@ -288,20 +295,17 @@ export default function Home() {
             </select>
           </label>
           {inQueue ? (
-            <>
-              <p className="text-lg text-gray-300 mb-4">Waiting for opponent...</p>
-              <button
-                className="gradient-btn mb-2 px-6 py-2"
-                onClick={async () => {
-                  if (user) {
-                    await supabase.from('matchmaking_queue').delete().eq('user_id', user.id)
-                    setInQueue(false)
-                  }
-                }}
-              >
-                Cancel
-              </button>
-            </>
+            <button
+              className="gradient-btn mb-2 px-6 py-2"
+              onClick={async () => {
+                if (user) {
+                  await supabase.from('matchmaking_queue').delete().eq('user_id', user.id)
+                  setInQueue(false)
+                }
+              }}
+            >
+              Cancel
+            </button>
           ) : (
             <button
               className="gradient-btn mb-2 px-8 py-3"
@@ -335,7 +339,7 @@ export default function Home() {
             </li>
           ))}
         </ul>
-        {gameStatus === 'active' && question && (
+  {gameStatus === 'active' && question && !winner && (
           <div className="glass-section flex flex-col items-center mt-4 p-6 w-full max-w-md">
             <h3 className="gradient-title text-xl mb-4">Question:</h3>
             <div className="text-2xl font-bold text-blue-400 mb-4">{question.question}</div>
@@ -359,24 +363,39 @@ export default function Home() {
               onClick={async () => {
                 if (user && game) {
                   await supabase.from('players').delete().eq('user_id', user.id).eq('game_id', game.id)
-                  // Submit best score to leaderboard
-                  const { submitScore } = await import("@/lib/utils/submitScore");
-                  const supabaseSession = await supabase.auth.getSession();
-                  const supabaseUser = supabaseSession.data.session?.user;
-                  if (supabaseUser) {
-                    await submitScore("maths-duel", supabaseUser, score);
-                  }
                   setGame(null)
                   setPlayers([])
                   setQuestion(null)
                   setInput('')
                   setScore(0)
                   setGameStatus('waiting')
+                  setWinner(null)
                 }
               }}
             >
               Leave Game
             </button>
+  {/* @ts-ignore */}
+  {gameStatus === 'finished' && winner && (
+          <div className="glass-section flex flex-col items-center mt-4 p-6 w-full max-w-md">
+            <h3 className="gradient-title text-xl mb-4">Game Over!</h3>
+            <div className="text-2xl font-bold text-blue-400 mb-4">Winner: {winner}</div>
+            <button
+              className="gradient-btn mb-2 px-6 py-2"
+              onClick={() => {
+                setGame(null);
+                setPlayers([]);
+                setQuestion(null);
+                setInput('');
+                setScore(0);
+                setGameStatus('waiting');
+                setWinner(null);
+              }}
+            >
+              Play Again
+            </button>
+          </div>
+        )}
           </div>
         )}
       </div>
