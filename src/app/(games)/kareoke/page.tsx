@@ -1,19 +1,39 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
+type KaraokeRoom = {
+  id: string;
+  song: string;
+  lyrics: string;
+  scores: { [uid: string]: number };
+  players: string[];
+};
+// ...existing code...
 import Pitchfinder from 'pitchfinder';
 type Song = {
   id: string;
   title: string;
   ['artist-credit']?: { name: string }[];
 };
+// Supabase setup
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-export default function Home() {
+function KaraokePage() {
+  // Multiplayer state
+  const [roomId, setRoomId] = useState('');
+  const [userId] = useState(() => Math.random().toString(36).substring(2, 10)); // random user id for demo
+  const [players, setPlayers] = useState<string[]>([]);
+  const [roomError, setRoomError] = useState('');
+  // Karaoke state
   const [query, setQuery] = useState('');
   const [songs, setSongs] = useState<Song[]>([]);
   const [lyrics, setLyrics] = useState('');
   const [lyricsLoading, setLyricsLoading] = useState(false);
   const [audioUrl, setAudioUrl] = useState('');
   const [score, setScore] = useState(0);
+  const [scores, setScores] = useState<{[uid: string]: number}>({});
   const [searchLoading, setSearchLoading] = useState(false);
   const [error, setError] = useState('');
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -21,6 +41,45 @@ export default function Home() {
   const audioContextRef = useRef<AudioContext | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const scoringRef = useRef(false);
+
+  // Multiplayer: create/join room
+  const createRoom = async () => {
+    setRoomError('');
+    const { data, error } = await supabase
+      .from('karaoke_rooms')
+      .insert([{ song: '', lyrics: '', scores: {}, players: [userId] }])
+      .select();
+    if (error) setRoomError(error.message);
+    else if (data && data[0]) setRoomId(data[0].id);
+  };
+
+  const joinRoom = async (id: string) => {
+    setRoomError('');
+    setRoomId(id);
+    // Add user to room (fetch current, append, update)
+    const { data: roomData } = await supabase.from('karaoke_rooms').select('players').eq('id', id).single();
+    if (roomData) {
+      const updatedPlayers = roomData.players.includes(userId) ? roomData.players : [...roomData.players, userId];
+      await supabase.from('karaoke_rooms').update({ players: updatedPlayers }).eq('id', id);
+    }
+  };
+
+  // Listen for room changes
+  useEffect(() => {
+    if (!roomId) return;
+    const channel = supabase
+      .channel('karaoke_room_' + roomId)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'karaoke_rooms' }, payload => {
+        const room = payload.new as KaraokeRoom;
+        if (room) {
+          setLyrics(room.lyrics);
+          setScores(room.scores || {});
+          setPlayers(room.players || []);
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [roomId]);
 
   const searchSongs = async () => {
     setSearchLoading(true);
@@ -45,6 +104,10 @@ export default function Home() {
     try {
       const res = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`);
       const data = await res.json();
+      // Multiplayer: update lyrics in room
+      if (roomId) {
+        await supabase.from('karaoke_rooms').update({ lyrics: data.lyrics || 'Lyrics not found' }).eq('id', roomId);
+      }
       setLyrics(data.lyrics || 'Lyrics not found');
       if (!data.lyrics) setError('Lyrics not found.');
     } catch (e) {
@@ -95,8 +158,19 @@ export default function Home() {
               if (lastPitch !== null) {
                 const diff = Math.abs(pitch - lastPitch);
                 setScore(prev => prev + Math.max(0, 10 - Math.floor(diff / 10)));
+                // Multiplayer: update score in room
+                if (roomId && userId) {
+                  supabase.from('karaoke_rooms').update({
+                    scores: { ...scores, [userId]: score }
+                  }).eq('id', roomId);
+                }
               } else {
                 setScore(prev => prev + 5);
+                if (roomId && userId) {
+                  supabase.from('karaoke_rooms').update({
+                    scores: { ...scores, [userId]: score }
+                  }).eq('id', roomId);
+                }
               }
               lastPitch = pitch;
             }
@@ -115,6 +189,17 @@ export default function Home() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-950">
+      {/* Multiplayer UI */}
+      <div className="mb-4">
+        <div className="flex gap-2">
+          <button onClick={createRoom} className="px-4 py-2 bg-green-700 text-white rounded">Create Room</button>
+          <input value={roomId} onChange={e => setRoomId(e.target.value)} placeholder="Room ID" className="px-2 py-1 rounded" />
+          <button onClick={() => joinRoom(roomId)} className="px-4 py-2 bg-blue-700 text-white rounded">Join Room</button>
+        </div>
+        {roomError && <div className="text-red-400">{roomError}</div>}
+        {roomId && <div className="text-green-400">Room: {roomId}</div>}
+        {players.length > 0 && <div className="text-white">Players: {players.join(', ')}</div>}
+      </div>
       <div className="bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-xl border border-gray-800">
         <h1 className="text-3xl font-bold text-white mb-6 text-center">KaraokeLab</h1>
         <div className="flex gap-2 mb-6">
@@ -185,8 +270,21 @@ export default function Home() {
         </div>
         <div className="text-center">
           <span className="text-lg font-bold text-purple-400">Score: {score}</span>
+          {roomId && (
+            <div className="mt-2">
+              <h3 className="text-purple-300">Multiplayer Scores</h3>
+              <ul>
+                {Object.entries(scores).map(([uid, sc]) => (
+                  <li key={uid} className="text-white">{uid}: {sc}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
+
+export default KaraokePage;
+// ...existing code...
