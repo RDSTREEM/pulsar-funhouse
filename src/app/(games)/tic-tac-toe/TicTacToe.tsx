@@ -45,6 +45,9 @@ function TicTacToe() {
   return (
     <div className="text-center w-full">
       <h1 className="gradient-title text-4xl mb-6">Tic Tac Toe</h1>
+      <div className="mb-2 text-sm max-w-md mx-auto">
+        <strong>How to Play:</strong> Two players take turns marking empty squares on a 3x3 grid, one as X and one as O. The first to get three in a row (horizontally, vertically, or diagonally) wins. If all squares are filled and no one has three in a row, it's a draw.
+      </div>
       <div className="grid grid-cols-3 gap-2 justify-center items-center mx-auto mb-6 w-64">
         {board.map((cell, i) => (
           <button
