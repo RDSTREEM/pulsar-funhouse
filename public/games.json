@@ -36,5 +36,12 @@
     "description": "Draw while the rest try to guess",
     "url": "/pictonary",
     "badge": "Requires Login"
+  },
+  {
+    "name": "Karaoke",
+    "slug": "karaoke",
+    "description": "Sing along to your favorite songs",
+    "url": "/kareoke",
+    "badge": "Requires Login"
   }
 ]
