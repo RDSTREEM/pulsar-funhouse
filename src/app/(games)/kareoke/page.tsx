@@ -11,48 +11,106 @@ export default function Home() {
   const [query, setQuery] = useState('');
   const [songs, setSongs] = useState<Song[]>([]);
   const [lyrics, setLyrics] = useState('');
+  const [lyricsLoading, setLyricsLoading] = useState(false);
   const [audioUrl, setAudioUrl] = useState('');
   const [score, setScore] = useState(0);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [error, setError] = useState('');
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const scoringRef = useRef(false);
 
   const searchSongs = async () => {
-    const res = await fetch(`https://musicbrainz.org/ws/2/recording?query=${encodeURIComponent(query)}&fmt=json`);
-    const data = await res.json();
-    setSongs(data.recordings || []);
+    setSearchLoading(true);
+    setError('');
+    try {
+      const res = await fetch(`https://musicbrainz.org/ws/2/recording?query=${encodeURIComponent(query)}&fmt=json`);
+      const data = await res.json();
+      setSongs(data.recordings || []);
+      if (!data.recordings || data.recordings.length === 0) {
+        setError('No songs found.');
+      }
+    } catch (e) {
+      setError('Error searching songs.');
+    }
+    setSearchLoading(false);
   };
 
   const fetchLyrics = async (artist: string, title: string) => {
-    const res = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`);
-    const data = await res.json();
-    setLyrics(data.lyrics || 'Lyrics not found');
+    setLyricsLoading(true);
+    setLyrics('');
+    setError('');
+    try {
+      const res = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`);
+      const data = await res.json();
+      setLyrics(data.lyrics || 'Lyrics not found');
+      if (!data.lyrics) setError('Lyrics not found.');
+    } catch (e) {
+      setLyrics('Lyrics not found');
+      setError('Error fetching lyrics.');
+    }
+    setLyricsLoading(false);
+  };
+
+  const cleanupAudio = () => {
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    analyserRef.current = null;
+    scoringRef.current = false;
   };
 
   const startScoring = () => {
     if (!audioRef.current) return;
+    cleanupAudio();
+    scoringRef.current = true;
     navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      streamRef.current = stream;
       const audioContext = new AudioContext();
+      audioContextRef.current = audioContext;
       const source = audioContext.createMediaStreamSource(stream);
       analyserRef.current = audioContext.createAnalyser();
       if (analyserRef.current) {
         source.connect(analyserRef.current);
+        analyserRef.current.fftSize = 2048;
         const bufferLength = analyserRef.current.fftSize;
         const dataArray = new Float32Array(bufferLength);
         const detectPitch = Pitchfinder.YIN();
 
+        let lastPitch: number | null = null;
         const loop = () => {
+          if (!scoringRef.current) return;
           if (analyserRef.current) {
             analyserRef.current.getFloatTimeDomainData(dataArray);
             const pitch = detectPitch(dataArray);
             if (pitch) {
-              setScore(prev => prev + Math.floor(Math.random() * 3));
+              // Score based on pitch stability (less change = higher score)
+              if (lastPitch !== null) {
+                const diff = Math.abs(pitch - lastPitch);
+                setScore(prev => prev + Math.max(0, 10 - Math.floor(diff / 10)));
+              } else {
+                setScore(prev => prev + 5);
+              }
+              lastPitch = pitch;
             }
           }
           requestAnimationFrame(loop);
         };
         loop();
       }
-    });
+    }).catch(() => setError('Microphone access denied.'));
+  };
+
+  const stopScoring = () => {
+    scoringRef.current = false;
+    cleanupAudio();
   };
 
   return (
@@ -69,11 +127,12 @@ export default function Home() {
           <button
             onClick={searchSongs}
             className="px-4 py-2 rounded bg-purple-700 text-white font-semibold hover:bg-purple-800 transition"
+            disabled={searchLoading}
           >
-            Search
+            {searchLoading ? 'Searching...' : 'Search'}
           </button>
         </div>
-
+        {error && <div className="text-red-400 mb-4 text-center">{error}</div>}
         <div className="mb-6">
           {songs.map((s: Song) => (
             <button
@@ -89,14 +148,15 @@ export default function Home() {
             </button>
           ))}
         </div>
-
-        {lyrics && (
+        {lyricsLoading && (
+          <div className="mb-6 text-purple-400 text-center">Loading lyrics...</div>
+        )}
+        {lyrics && !lyricsLoading && (
           <div className="mb-6">
             <h2 className="text-xl font-semibold text-purple-400 mb-2">Lyrics</h2>
             <pre className="bg-gray-800 rounded p-4 text-gray-200 whitespace-pre-wrap max-h-64 overflow-y-auto">{lyrics}</pre>
           </div>
         )}
-
         <div className="mb-6">
           <input
             type="file"
@@ -105,6 +165,8 @@ export default function Home() {
               const files = e.target.files;
               if (files && files[0]) {
                 setAudioUrl(URL.createObjectURL(files[0]));
+                setScore(0);
+                stopScoring();
               }
             }}
             className="block w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-700 mb-2"
@@ -115,11 +177,12 @@ export default function Home() {
               src={audioUrl}
               controls
               onPlay={startScoring}
+              onPause={stopScoring}
+              onEnded={stopScoring}
               className="w-full mt-2"
             />
           )}
         </div>
-
         <div className="text-center">
           <span className="text-lg font-bold text-purple-400">Score: {score}</span>
         </div>
