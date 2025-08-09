@@ -44,16 +44,20 @@ function TicTacToe() {
   }
 
   return (
-    <div className="text-center">
-      <h1 className="text-2xl font-bold mb-4">Tic Tac Toe</h1>
-      <div className="board">
+    <div className="text-center w-full">
+      <h1 className="gradient-title text-4xl mb-6">Tic Tac Toe</h1>
+      <div className="grid grid-cols-3 gap-2 justify-center items-center mx-auto mb-6 w-64">
         {board.map((cell, i) => (
-          <button key={i} className="cell" onClick={() => handleClick(i)}>
+          <button
+            key={i}
+            className="glass-card flex items-center justify-center w-20 h-20 text-3xl font-bold transition-transform duration-150 hover:scale-105 focus:outline-none"
+            onClick={() => handleClick(i)}
+          >
             {cell}
           </button>
         ))}
       </div>
-      <div className="mt-4 text-lg">
+      <div className="mt-4 text-lg text-gray-200">
         {winner
           ? `Winner: ${winner}`
           : board.every(Boolean)
@@ -61,7 +65,7 @@ function TicTacToe() {
           : `Turn: ${isXNext ? "X" : "O"}`}
       </div>
       <button
-        className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
+        className="gradient-btn mt-6 px-6 py-2"
         onClick={resetGame}
       >
         Restart

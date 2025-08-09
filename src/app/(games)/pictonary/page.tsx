@@ -285,11 +285,11 @@ export default function Pictionary() {
 
   if (!user)
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-        <div className="bg-white rounded-lg shadow-md p-8 w-full max-w-md text-center">
-          <p className="mb-4 text-lg font-semibold text-gray-700">Please sign in to play.</p>
+      <div className="glass-main flex flex-col items-center justify-center min-h-screen">
+        <div className="glass-card p-8 w-full max-w-md text-center">
+          <p className="gradient-title mb-4 text-lg font-semibold">Please sign in to play.</p>
           <button
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition"
+            className="gradient-btn w-full"
             onClick={() => supabase.auth.signInWithOAuth({ provider: 'github' })}
           >
             Sign in with GitHub
@@ -301,17 +301,17 @@ export default function Pictionary() {
 
   if (!room)
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-        <div className="bg-white rounded-lg shadow-md p-8 w-full max-w-md text-center">
-          <h2 className="text-2xl font-bold mb-6 text-blue-700">Pictionary Lobby</h2>
+      <div className="glass-main flex flex-col items-center justify-center min-h-screen">
+        <div className="glass-card p-8 w-full max-w-md text-center">
+          <h2 className="gradient-title text-2xl font-bold mb-6">Pictionary Lobby</h2>
           <button
-            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4 w-full transition"
+            className="gradient-btn w-full mb-4"
             onClick={createRoom}
           >
             Create Room
           </button>
           <button
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full transition"
+            className="gradient-btn w-full"
             onClick={joinRoom}
           >
             Join Room by ID
@@ -323,32 +323,32 @@ export default function Pictionary() {
 
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-50 py-8">
-      <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl">
-        <h2 className="text-3xl font-bold mb-4 text-blue-700">Pictionary Room</h2>
-        <div className="mb-4 flex flex-wrap gap-4 justify-between items-center">
+    <div className="glass-main flex flex-col items-center min-h-screen py-8">
+      <div className="glass-card p-8 w-full max-w-2xl">
+        <h2 className="gradient-title text-3xl font-bold mb-4">Pictionary Room</h2>
+        <div className="glass-section mb-4 flex flex-wrap gap-4 justify-between items-center">
           <div>
-            <span className="font-semibold text-gray-600">Room ID:</span> <span className="text-gray-800">{room.id}</span>
+            <span className="font-semibold">Room ID:</span> <span className="glass-badge">{room.id}</span>
           </div>
           <div>
-            <span className="font-semibold text-gray-600">Status:</span> <span className="text-gray-800">{room.status}</span>
+            <span className="font-semibold">Status:</span> <span className="glass-badge">{room.status}</span>
           </div>
           <div>
-            <span className="font-semibold text-gray-600">Your Score:</span> <span className="text-green-700 font-bold">{players.find((p) => p.user_id === user.id)?.score || 0}</span>
+            <span className="font-semibold">Your Score:</span> <span className="glass-badge gradient-title">{players.find((p) => p.user_id === user.id)?.score || 0}</span>
           </div>
         </div>
-        <div className="mb-4">
-          <span className="font-semibold text-gray-600">Players:</span>
+        <div className="glass-section mb-4">
+          <span className="font-semibold">Players:</span>
           <ul className="flex flex-wrap gap-2 mt-2">
             {players.map((p) => (
-              <li key={p.id} className={`px-3 py-1 rounded-full text-sm font-medium ${p.is_host ? 'bg-yellow-200 text-yellow-900' : 'bg-gray-200 text-gray-700'}`}>{p.username}{p.is_host ? ' (Host)' : ''}</li>
+              <li key={p.id} className={`glass-badge text-sm font-medium ${p.is_host ? 'gradient-title' : ''}`}>{p.username}{p.is_host ? ' (Host)' : ''}</li>
             ))}
           </ul>
         </div>
 
         {room.status === 'waiting' && room.host_user_id === user.id && (
           <button
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4 transition"
+            className="gradient-btn w-full mb-4"
             onClick={startTurn}
           >
             Start Drawing Turn
@@ -356,8 +356,8 @@ export default function Pictionary() {
         )}
 
         {isDrawingTurn && (
-          <div className="mb-4 p-4 bg-blue-50 rounded border border-blue-200 text-blue-800 text-lg font-semibold">
-            You are drawing: <strong>{currentWord}</strong>
+          <div className="glass-section mb-4 text-lg font-semibold">
+            You are drawing: <strong className="gradient-title">{currentWord}</strong>
           </div>
         )}
 
@@ -365,25 +365,25 @@ export default function Pictionary() {
           <div className="flex flex-col items-center">
             <canvas
               ref={canvasRef}
-              style={{ border: '2px solid #3b82f6', borderRadius: 12, background: '#f9fafb', cursor: isDrawingTurn ? 'crosshair' : 'not-allowed' }}
+              style={{ border: '2px solid #3b82f6', borderRadius: 12, background: 'rgba(255,255,255,0.08)', boxShadow: '0 4px 32px rgba(0,0,0,0.12)', cursor: isDrawingTurn ? 'crosshair' : 'not-allowed' }}
               width={600}
               height={400}
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
-              className="mb-2 shadow-md"
+              className="mb-2 glass-card"
             ></canvas>
             <span className="text-xs text-gray-400">{isDrawingTurn ? 'Draw the word above!' : 'Wait for your turn to draw.'}</span>
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-bold mb-2 text-gray-700">Chat</h3>
-            <div className="h-40 overflow-y-scroll border border-gray-300 rounded p-2 bg-gray-50 mb-2">
+            <h3 className="gradient-title text-xl font-bold mb-2">Chat</h3>
+            <div className="glass-section h-40 overflow-y-scroll mb-2">
               {chatMessages.length === 0 ? (
                 <div className="text-gray-400 text-center">No messages yet.</div>
               ) : (
                 chatMessages.map((msg) => (
                   <div key={msg.id} className="mb-1">
-                    <b className="text-blue-700">{players.find((p) => p.user_id === msg.user_id)?.username || 'Unknown'}:</b> <span className="text-gray-800">{msg.message}</span>
+                    <b className="gradient-title">{players.find((p) => p.user_id === msg.user_id)?.username || 'Unknown'}:</b> <span className="text-gray-800">{msg.message}</span>
                   </div>
                 ))
               )}
@@ -397,10 +397,10 @@ export default function Pictionary() {
                   if (e.key === 'Enter') sendChatMessage();
                 }}
                 placeholder="Type your guess..."
-                className="flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="glass-input flex-1"
               />
               <button
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition"
+                className="gradient-btn"
                 onClick={sendChatMessage}
               >
                 Send

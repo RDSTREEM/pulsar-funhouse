@@ -2,9 +2,11 @@ import FlappyBird from './flappy_bird';
 
 export default function FlappyBirdPage() {
   return (
-    <div>
-      <h2 style={{ textAlign: 'center', margin: '24px 0 8px', color: '#379dbe' }}>Flappy Bird</h2>
-      <FlappyBird />
+    <div className="glass-main">
+      <div className="glass-card w-full max-w-xl mx-auto flex flex-col items-center p-8">
+        <h2 className="gradient-title text-4xl mb-6">Flappy Bird</h2>
+        <FlappyBird />
+      </div>
     </div>
   );
 }

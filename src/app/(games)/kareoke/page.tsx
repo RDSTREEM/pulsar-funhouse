@@ -188,98 +188,100 @@ function KaraokePage() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-950">
-      {/* Multiplayer UI */}
-      <div className="mb-4">
-        <div className="flex gap-2">
-          <button onClick={createRoom} className="px-4 py-2 bg-green-700 text-white rounded">Create Room</button>
-          <input value={roomId} onChange={e => setRoomId(e.target.value)} placeholder="Room ID" className="px-2 py-1 rounded" />
-          <button onClick={() => joinRoom(roomId)} className="px-4 py-2 bg-blue-700 text-white rounded">Join Room</button>
-        </div>
-        {roomError && <div className="text-red-400">{roomError}</div>}
-        {roomId && <div className="text-green-400">Room: {roomId}</div>}
-        {players.length > 0 && <div className="text-white">Players: {players.join(', ')}</div>}
-      </div>
-      <div className="bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-xl border border-gray-800">
-        <h1 className="text-3xl font-bold text-white mb-6 text-center">KaraokeLab</h1>
-        <div className="flex gap-2 mb-6">
-          <input
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder="Search for a song"
-            className="flex-1 px-4 py-2 rounded bg-gray-800 text-white placeholder-gray-400 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-600"
-          />
-          <button
-            onClick={searchSongs}
-            className="px-4 py-2 rounded bg-purple-700 text-white font-semibold hover:bg-purple-800 transition"
-            disabled={searchLoading}
-          >
-            {searchLoading ? 'Searching...' : 'Search'}
-          </button>
-        </div>
-        {error && <div className="text-red-400 mb-4 text-center">{error}</div>}
-        <div className="mb-6">
-          {songs.map((s: Song) => (
-            <button
-              key={s.id}
-              onClick={() => {
-                const title = s.title;
-                const artist = s['artist-credit']?.[0]?.name || '';
-                fetchLyrics(artist, title);
-              }}
-              className="block w-full text-left px-4 py-2 mb-2 rounded bg-gray-800 text-white hover:bg-purple-700 transition"
-            >
-              {s.title} - {s['artist-credit']?.[0]?.name}
-            </button>
-          ))}
-        </div>
-        {lyricsLoading && (
-          <div className="mb-6 text-purple-400 text-center">Loading lyrics...</div>
-        )}
-        {lyrics && !lyricsLoading && (
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold text-purple-400 mb-2">Lyrics</h2>
-            <pre className="bg-gray-800 rounded p-4 text-gray-200 whitespace-pre-wrap max-h-64 overflow-y-auto">{lyrics}</pre>
+    <div className="glass-main">
+      <div className="glass-card w-full max-w-xl mx-auto flex flex-col items-center p-8">
+        {/* Multiplayer UI */}
+        <div className="mb-4 w-full">
+          <div className="flex gap-2">
+            <button onClick={createRoom} className="gradient-btn">Create Room</button>
+            <input value={roomId} onChange={e => setRoomId(e.target.value)} placeholder="Room ID" className="glass-input w-32" />
+            <button onClick={() => joinRoom(roomId)} className="gradient-btn">Join Room</button>
           </div>
-        )}
-        <div className="mb-6">
-          <input
-            type="file"
-            accept="audio/*"
-            onChange={e => {
-              const files = e.target.files;
-              if (files && files[0]) {
-                setAudioUrl(URL.createObjectURL(files[0]));
-                setScore(0);
-                stopScoring();
-              }
-            }}
-            className="block w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-700 mb-2"
-          />
-          {audioUrl && (
-            <audio
-              ref={audioRef}
-              src={audioUrl}
-              controls
-              onPlay={startScoring}
-              onPause={stopScoring}
-              onEnded={stopScoring}
-              className="w-full mt-2"
-            />
-          )}
+          {roomError && <div className="text-red-400">{roomError}</div>}
+          {roomId && <div className="text-green-400">Room: {roomId}</div>}
+          {players.length > 0 && <div className="text-white">Players: {players.join(', ')}</div>}
         </div>
-        <div className="text-center">
-          <span className="text-lg font-bold text-purple-400">Score: {score}</span>
-          {roomId && (
-            <div className="mt-2">
-              <h3 className="text-purple-300">Multiplayer Scores</h3>
-              <ul>
-                {Object.entries(scores).map(([uid, sc]) => (
-                  <li key={uid} className="text-white">{uid}: {sc}</li>
-                ))}
-              </ul>
+        <div className="glass-section w-full p-8">
+          <h1 className="gradient-title text-3xl mb-6 text-center">KaraokeLab</h1>
+          <div className="flex gap-2 mb-6">
+            <input
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Search for a song"
+              className="glass-input flex-1"
+            />
+            <button
+              onClick={searchSongs}
+              className="gradient-btn"
+              disabled={searchLoading}
+            >
+              {searchLoading ? 'Searching...' : 'Search'}
+            </button>
+          </div>
+          {error && <div className="text-red-400 mb-4 text-center">{error}</div>}
+          <div className="mb-6">
+            {songs.map((s: Song) => (
+              <button
+                key={s.id}
+                onClick={() => {
+                  const title = s.title;
+                  const artist = s['artist-credit']?.[0]?.name || '';
+                  fetchLyrics(artist, title);
+                }}
+                className="block w-full text-left px-4 py-2 mb-2 rounded bg-gray-800 text-white hover:bg-purple-700 transition"
+              >
+                {s.title} - {s['artist-credit']?.[0]?.name}
+              </button>
+            ))}
+          </div>
+          {lyricsLoading && (
+            <div className="mb-6 text-purple-400 text-center">Loading lyrics...</div>
+          )}
+          {lyrics && !lyricsLoading && (
+            <div className="mb-6">
+              <h2 className="gradient-title text-xl mb-2">Lyrics</h2>
+              <pre className="bg-gray-800 rounded p-4 text-gray-200 whitespace-pre-wrap max-h-64 overflow-y-auto">{lyrics}</pre>
             </div>
           )}
+          <div className="mb-6">
+            <input
+              type="file"
+              accept="audio/*"
+              onChange={e => {
+                const files = e.target.files;
+                if (files && files[0]) {
+                  setAudioUrl(URL.createObjectURL(files[0]));
+                  setScore(0);
+                  stopScoring();
+                }
+              }}
+              className="glass-input block w-full mb-2"
+            />
+            {audioUrl && (
+              <audio
+                ref={audioRef}
+                src={audioUrl}
+                controls
+                onPlay={startScoring}
+                onPause={stopScoring}
+                onEnded={stopScoring}
+                className="w-full mt-2"
+              />
+            )}
+          </div>
+          <div className="text-center">
+            <span className="text-lg font-bold text-purple-400">Score: {score}</span>
+            {roomId && (
+              <div className="mt-2">
+                <h3 className="text-purple-300">Multiplayer Scores</h3>
+                <ul>
+                  {Object.entries(scores).map(([uid, sc]) => (
+                    <li key={uid} className="text-white">{uid}: {sc}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

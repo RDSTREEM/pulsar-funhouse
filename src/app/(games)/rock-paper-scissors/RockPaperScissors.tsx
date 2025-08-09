@@ -78,13 +78,13 @@ export default function RockPaperScissors() {
 
   return (
     <motion.div
-      className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 px-4 py-8"
+      className="glass-main"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="relative bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-full max-w-xl flex flex-col items-center border-2 border-purple-700/40"
+        className="glass-card w-full max-w-xl flex flex-col items-center relative p-8"
         initial={{ scale: 0.9, y: 40, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 120 }}
@@ -98,7 +98,7 @@ export default function RockPaperScissors() {
           <SparklesIcon className="w-10 h-10 text-purple-500 animate-pulse" />
         </motion.div>
         <motion.h1
-          className="text-5xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400 drop-shadow-lg"
+          className="gradient-title text-5xl mb-2"
           initial={{ y: -30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
         >
@@ -127,14 +127,14 @@ export default function RockPaperScissors() {
                 type="text"
                 value={userMove}
                 onChange={e => setUserMove(e.target.value)}
-                className="px-5 py-3 border-2 border-pink-400/60 rounded-xl w-64 text-lg focus:outline-none focus:ring-2 focus:ring-purple-400 bg-gray-950 text-white shadow-lg placeholder:text-gray-500 animate-[wiggle_1.5s_ease-in-out_infinite]"
+                className="glass-input w-64 animate-[wiggle_1.5s_ease-in-out_infinite]"
                 placeholder={moves.length === 0 ? "Start with any move!" : `Your move to beat \"${moves[moves.length-1]}\"`}
                 disabled={inputDisabled}
                 whileFocus={{ scale: 1.05 }}
               />
               <motion.button
                 type="submit"
-                className="px-5 py-3 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white font-bold rounded-xl shadow-lg hover:scale-105 transition-transform border-2 border-purple-700/40 animate-[bounce_1.2s_infinite]"
+                className="gradient-btn animate-[bounce_1.2s_infinite]"
                 disabled={inputDisabled}
                 whileHover={{ scale: 1.12, rotate: 2 }}
                 whileTap={{ scale: 0.97 }}
@@ -201,24 +201,24 @@ export default function RockPaperScissors() {
         </AnimatePresence>
 
         <motion.div
-          className="mt-8 text-left w-full"
+          className="glass-history"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <h2 className="font-bold mb-3 text-xl text-pink-400 drop-shadow">Move History</h2>
+          <h2 className="gradient-title font-bold mb-3 text-xl">Move History</h2>
           <ul className="list-none pl-0">
             <AnimatePresence>
               {moves.map((move, i) => (
                 <motion.li
                   key={i}
-                  className="mb-2 flex items-center gap-2 animate-[fadeIn_0.7s]"
+                  className="glass-move animate-[fadeIn_0.7s]"
                   initial={{ x: -30, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   exit={{ x: -30, opacity: 0 }}
                   transition={{ type: "spring", stiffness: 150 }}
                 >
-                  <span className="font-semibold text-purple-400">{i === 0 ? "Start:" : `Move ${i}:`}</span>
+                  <span>{i === 0 ? "Start:" : `Move ${i}:`}</span>
                   <span className="text-gray-200">{move}</span>
                 </motion.li>
               ))}

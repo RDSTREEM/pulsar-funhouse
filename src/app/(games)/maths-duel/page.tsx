@@ -261,124 +261,125 @@ export default function Home() {
   }, [game])
 
   if (loading) return (
-    <div style={{ background: '#111', color: '#eee', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p>Loading...</p>
+    <div className="glass-main flex items-center justify-center">
+      <p className="text-gray-300">Loading...</p>
     </div>
   )
 
   if (!user)
     return (
-      <div style={{ background: '#111', color: '#eee', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-        <h1 style={{ fontWeight: 700, fontSize: 32, marginBottom: 16 }}>Quick Math Duel</h1>
-        <p style={{ fontSize: 18, opacity: 0.7 }}>You must be logged in to play.</p>
+      <div className="glass-main flex flex-col items-center justify-center">
+        <h1 className="gradient-title text-4xl mb-6">Quick Math Duel</h1>
+        <p className="text-lg text-gray-300">You must be logged in to play.</p>
       </div>
     )
 
   if (!game) {
     return (
-      <div style={{ background: '#111', color: '#eee', minHeight: '100vh', padding: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-        <h1 style={{ fontWeight: 700, fontSize: 28, marginBottom: 8 }}>Welcome <span style={{ color: '#00eaff' }}>{user.email || user.id}</span></h1>
-        <label style={{ fontSize: 18, marginBottom: 16 }}>
-          Select Difficulty:
-          <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} style={{ marginLeft: 10, background: '#222', color: '#eee', border: '1px solid #333', borderRadius: 6, padding: '4px 12px' }}>
-            <option value="easy">Easy (+, -)</option>
-            <option value="medium">Medium (+, -, *)</option>
-            <option value="hard">Hard (+, -, *, /)</option>
-          </select>
-        </label>
-        {inQueue ? (
-          <>
-            <p style={{ margin: '16px 0', fontSize: 18 }}>Waiting for opponent...</p>
+      <div className="glass-main flex flex-col items-center justify-center p-8">
+        <div className="glass-card w-full max-w-xl mx-auto flex flex-col items-center p-8">
+          <h1 className="gradient-title text-3xl mb-6">Welcome <span className="text-blue-400">{user.email || user.id}</span></h1>
+          <label className="text-lg mb-4">
+            Select Difficulty:
+            <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} className="ml-2 glass-input">
+              <option value="easy">Easy (+, -)</option>
+              <option value="medium">Medium (+, -, *)</option>
+              <option value="hard">Hard (+, -, *, /)</option>
+            </select>
+          </label>
+          {inQueue ? (
+            <>
+              <p className="text-lg text-gray-300 mb-4">Waiting for opponent...</p>
+              <button
+                className="gradient-btn mb-2 px-6 py-2"
+                onClick={async () => {
+                  if (user) {
+                    await supabase.from('matchmaking_queue').delete().eq('user_id', user.id)
+                    setInQueue(false)
+                  }
+                }}
+              >
+                Cancel
+              </button>
+            </>
+          ) : (
             <button
-              style={{ background: '#222', color: '#00eaff', border: 'none', borderRadius: 6, padding: '10px 24px', fontWeight: 600, fontSize: 16, cursor: 'pointer', marginBottom: 8 }}
-              onClick={async () => {
-                if (user) {
-                  await supabase.from('matchmaking_queue').delete().eq('user_id', user.id)
-                  setInQueue(false)
-                }
-              }}
+              className="gradient-btn mb-2 px-8 py-3"
+              onClick={enterQueue}
             >
-              Cancel
+              Find Match
             </button>
-          </>
-        ) : (
+          )}
           <button
-            style={{ background: 'linear-gradient(90deg, #00eaff 0%, #0051ff 100%)', color: '#111', border: 'none', borderRadius: 6, padding: '12px 32px', fontWeight: 700, fontSize: 18, cursor: 'pointer', marginBottom: 8, boxShadow: '0 2px 8px #0006' }}
-            onClick={enterQueue}
+            className="glass-input mt-6 px-6 py-2 text-lg font-bold text-white bg-gray-800 border-none"
+            onClick={signOut}
           >
-            Find Match
+            Sign Out
           </button>
-        )}
-        <button
-          style={{ background: '#222', color: '#eee', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 500, fontSize: 15, cursor: 'pointer', marginTop: 24 }}
-          onClick={signOut}
-        >
-          Sign Out
-        </button>
+        </div>
       </div>
     )
   }
 
   return (
-    <div style={{ background: '#111', color: '#eee', minHeight: '100vh', padding: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-      <h1 style={{ fontWeight: 700, fontSize: 28, marginBottom: 8 }}>Game ID: <span style={{ color: '#00eaff' }}>{game.id}</span></h1>
-      <h2 style={{ fontWeight: 600, fontSize: 22, marginBottom: 16 }}>Status: <span style={{ color: gameStatus === 'active' ? '#00eaff' : '#eee' }}>{gameStatus}</span></h2>
-
-      <h3 style={{ fontWeight: 600, fontSize: 20, marginBottom: 8 }}>Players:</h3>
-      <ul style={{ listStyle: 'none', padding: 0, marginBottom: 16, width: '100%', maxWidth: 400 }}>
-        {players.map((p) => (
-          <li key={p.id} style={{ background: '#222', borderRadius: 6, marginBottom: 8, padding: '8px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 16 }}>
-            <span style={{ color: p.user_id === user.id ? '#00eaff' : '#eee', fontWeight: p.user_id === user.id ? 700 : 500 }}>{p.username}</span>
-            <span>Score: <span style={{ color: '#00eaff', fontWeight: 700 }}>{p.score}</span> {user && p.user_id === user.id ? <span style={{ color: '#00eaff' }}>(You)</span> : ''}</span>
-          </li>
-        ))}
-      </ul>
-
-      {gameStatus === 'active' && question && (
-        <div style={{ background: '#222', borderRadius: 8, padding: 24, marginTop: 16, width: '100%', maxWidth: 400, boxShadow: '0 2px 8px #0006', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <h3 style={{ fontWeight: 600, fontSize: 20, marginBottom: 16 }}>Question:</h3>
-          <div style={{ fontSize: 22, fontWeight: 700, color: '#00eaff', marginBottom: 16 }}>{question.question}</div>
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && submitAnswer()}
-            autoFocus
-            style={{ background: '#111', color: '#eee', border: '1px solid #333', borderRadius: 6, padding: '8px 16px', fontSize: 18, marginBottom: 12, width: '100%' }}
-          />
-          <button
-            style={{ background: 'linear-gradient(90deg, #00eaff 0%, #0051ff 100%)', color: '#111', border: 'none', borderRadius: 6, padding: '10px 24px', fontWeight: 700, fontSize: 18, cursor: 'pointer', marginBottom: 8, boxShadow: '0 2px 8px #0006' }}
-            onClick={submitAnswer}
-          >
-            Submit Answer
-          </button>
-
-          <h4 style={{ fontWeight: 600, fontSize: 18, marginTop: 12, color: '#eee' }}>Your Score: <span style={{ color: '#00eaff' }}>{score}</span></h4>
-          <button
-            style={{ background: '#222', color: '#eee', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 500, fontSize: 15, cursor: 'pointer', marginTop: 16 }}
-            onClick={async () => {
-              if (user && game) {
-                await supabase.from('players').delete().eq('user_id', user.id).eq('game_id', game.id)
-                // Submit best score to leaderboard
-                const { submitScore } = await import("@/lib/utils/submitScore");
-                const supabaseSession = await supabase.auth.getSession();
-                const supabaseUser = supabaseSession.data.session?.user;
-                if (supabaseUser) {
-                  await submitScore("maths-duel", supabaseUser, score);
+    <div className="glass-main flex flex-col items-center justify-center p-8">
+      <div className="glass-card w-full max-w-xl mx-auto flex flex-col items-center p-8">
+        <h1 className="gradient-title text-3xl mb-2">Game ID: <span className="text-blue-400">{game.id}</span></h1>
+        <h2 className="text-lg mb-4">Status: <span className={gameStatus === 'active' ? 'text-blue-400' : 'text-gray-200'}>{gameStatus}</span></h2>
+        <h3 className="text-lg mb-2 font-bold">Players:</h3>
+        <ul className="list-none mb-4 w-full max-w-md">
+          {players.map((p) => (
+            <li key={p.id} className="glass-section flex justify-between items-center mb-2 px-4 py-2 text-lg">
+              <span className={p.user_id === user.id ? 'text-blue-400 font-bold' : 'text-gray-200'}>{p.username}</span>
+              <span>Score: <span className="text-blue-400 font-bold">{p.score}</span> {user && p.user_id === user.id ? <span className="text-blue-400">(You)</span> : ''}</span>
+            </li>
+          ))}
+        </ul>
+        {gameStatus === 'active' && question && (
+          <div className="glass-section flex flex-col items-center mt-4 p-6 w-full max-w-md">
+            <h3 className="gradient-title text-xl mb-4">Question:</h3>
+            <div className="text-2xl font-bold text-blue-400 mb-4">{question.question}</div>
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && submitAnswer()}
+              autoFocus
+              className="glass-input mb-4 w-full"
+            />
+            <button
+              className="gradient-btn mb-2 px-6 py-2"
+              onClick={submitAnswer}
+            >
+              Submit Answer
+            </button>
+            <h4 className="text-lg mt-2 text-gray-200">Your Score: <span className="text-blue-400 font-bold">{score}</span></h4>
+            <button
+              className="glass-input mt-4 px-6 py-2 text-lg font-bold text-white bg-gray-800 border-none"
+              onClick={async () => {
+                if (user && game) {
+                  await supabase.from('players').delete().eq('user_id', user.id).eq('game_id', game.id)
+                  // Submit best score to leaderboard
+                  const { submitScore } = await import("@/lib/utils/submitScore");
+                  const supabaseSession = await supabase.auth.getSession();
+                  const supabaseUser = supabaseSession.data.session?.user;
+                  if (supabaseUser) {
+                    await submitScore("maths-duel", supabaseUser, score);
+                  }
+                  setGame(null)
+                  setPlayers([])
+                  setQuestion(null)
+                  setInput('')
+                  setScore(0)
+                  setGameStatus('waiting')
                 }
-                setGame(null)
-                setPlayers([])
-                setQuestion(null)
-                setInput('')
-                setScore(0)
-                setGameStatus('waiting')
-              }
-            }}
-          >
-            Leave Game
-          </button>
-        </div>
-      )}
+              }}
+            >
+              Leave Game
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

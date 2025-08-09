@@ -30,21 +30,21 @@ export default function LeaderboardsPage() {
   }, []);
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Leaderboards</h1>
+    <div className="glass-section p-8 max-w-3xl mx-auto mt-8">
+      <h1 className="gradient-title text-2xl mb-4">Leaderboards</h1>
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-gray-300">Loading...</p>
       ) : leaderboards.length === 0 ? (
-        <p>No leaderboards available.</p>
+        <p className="text-gray-300">No leaderboards available.</p>
       ) : (
         <div>
           {leaderboards.map((lb: Leaderboard) => (
             <div key={lb.id} className="mb-8">
-              <h2 className="text-xl font-semibold mb-2">{lb.game_name}</h2>
+              <h2 className="gradient-title text-xl mb-2">{lb.game_name}</h2>
               <ol className="list-decimal ml-6">
                 {lb.entries.map((entry: LeaderboardEntry) => (
-                  <li key={entry.user_id}>
-                    {entry.username || entry.user_id}: {entry.score}
+                  <li key={entry.user_id} className="text-gray-200">
+                    {entry.username || entry.user_id}: <span className="font-bold text-pink-400">{entry.score}</span>
                   </li>
                 ))}
               </ol>

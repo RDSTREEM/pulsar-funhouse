@@ -109,11 +109,11 @@ export default function GebetaBoard() {
   return (
     <div className="w-full max-w-xl">
       <div className="flex justify-between mb-4 text-sm sm:text-base">
-        <div>Player 1 (top): {scores[1]}</div>
-        <div>Player 0 (bottom): {scores[0]}</div>
+        <div className="text-pink-400 font-bold">Player 1 (top): {scores[1]}</div>
+        <div className="text-purple-400 font-bold">Player 0 (bottom): {scores[0]}</div>
       </div>
 
-      <div className="border-2 border-gray-700 rounded-2xl p-4 bg-amber-50">
+      <div className="glass-section p-4">
         <div className="flex justify-between mb-2">
           {board
             .slice(PITS_PER_ROW, PITS_PER_ROW * 2)
@@ -127,10 +127,10 @@ export default function GebetaBoard() {
       </div>
 
       <div className="mt-4 flex flex-col items-center gap-2">
-        <div className="text-gray-700 font-medium">{message}</div>
+        <div className="text-gray-200 font-medium">{message}</div>
         <button
           onClick={reset}
-          className="px-4 py-2 bg-blue-500 text-black rounded-lg shadow hover:bg-blue-600 transition"
+          className="gradient-btn px-6 py-2"
         >
           Reset
         </button>

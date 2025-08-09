@@ -63,8 +63,8 @@ export default function DailySection({ streak, onPuzzleSolved }: DailySectionPro
   }
 
   return (
-    <section className="bg-gray-800 rounded-lg p-6 mb-8 w-full max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold text-white mb-4">Daily</h2>
+    <section className="glass-section mb-8 w-full max-w-2xl mx-auto p-6">
+      <h2 className="gradient-title text-2xl mb-4">Daily</h2>
       <div className="mb-2 text-gray-300">Fact: {fact || <span className="italic text-gray-500">Loading...</span>}</div>
       <div className="mb-2 text-gray-300">Quote: {quote || <span className="italic text-gray-500">Loading...</span>}</div>
       <div className="mb-2 text-gray-300">Puzzle: {puzzle.question || <span className="italic text-gray-500">Loading...</span>}</div>
@@ -72,14 +72,14 @@ export default function DailySection({ streak, onPuzzleSolved }: DailySectionPro
         <div className="flex gap-2 mt-2">
           <input
             type="text"
-            className="px-2 py-1 rounded bg-gray-900 text-white"
+            className="glass-input"
             value={userAnswer}
             onChange={(e) => setUserAnswer(e.target.value)}
             placeholder="Your answer"
             disabled={!puzzle.question}
           />
           <button
-            className="bg-blue-500 text-white px-3 py-1 rounded"
+            className="gradient-btn px-3 py-1"
             onClick={checkAnswer}
             disabled={!puzzle.question}
           >

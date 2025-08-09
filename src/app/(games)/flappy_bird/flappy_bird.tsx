@@ -89,13 +89,11 @@ const FlappyBird: React.FC = () => {
   return (
     <div
       ref={gameRef}
+      className="glass-card mx-auto relative overflow-hidden"
       style={{
         width: GAME_WIDTH,
         height: GAME_HEIGHT,
         background: `url(${backgroundUrl})`,
-        position: 'relative',
-        overflow: 'hidden',
-        margin: '0 auto',
         borderRadius: 12,
         boxShadow: '0 0 20px #0003',
       }}
