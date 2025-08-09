@@ -8,7 +8,6 @@ import { SparklesIcon } from '@heroicons/react/24/solid';
 const GEMINI_API = `${process.env.NEXT_PUBLIC_GEMINI_API_URL}=${process.env.NEXT_PUBLIC_GEMINI_API_KEY}`;
 
 async function judgeMove(prevMove: string, newMove: string) {
-  // Prompt Gemini to judge if newMove beats prevMove
   const prompt = `You are an impartial judge in a creative battle game. The previous move was "${prevMove}". The user now claims "${newMove}" beats it. Respond ONLY with a valid JSON object (no markdown, no code block, no explanation). The object should have two fields: 'result' (true if the new move beats the previous, false otherwise) and 'reason' (a short, witty, or logical reason for your decision). Example: {"result": true, "reason": "A nuke obliterates scissors."}`;
   const body = {
     contents: [{ parts: [{ text: prompt }] }]
@@ -36,7 +35,7 @@ async function judgeMove(prevMove: string, newMove: string) {
 
 
 export default function RockPaperScissors() {
-  const [moves, setMoves] = useState<string[]>([]); // history of user moves
+  const [moves, setMoves] = useState<string[]>([]);
   const [userMove, setUserMove] = useState("");
   const [judgement, setJudgement] = useState<string>("");
   const [reason, setReason] = useState<string>("");
@@ -48,7 +47,6 @@ export default function RockPaperScissors() {
     if (!userMove.trim()) return;
     setInputDisabled(true);
     if (moves.length === 0) {
-      // First move, no judgement needed
       setMoves([userMove]);
       setJudgement("");
       setReason("");
@@ -56,7 +54,6 @@ export default function RockPaperScissors() {
       setInputDisabled(false);
       return;
     }
-    // Judge if userMove beats previous move
     const prevMove = moves[moves.length - 1];
     const ai = await judgeMove(prevMove, userMove);
     setJudgement(ai.result ? "Success!" : "Failed!");
@@ -77,48 +74,41 @@ export default function RockPaperScissors() {
   }
 
   return (
-    <motion.div
-      className="glass-main"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
+    <>
       <motion.div
-        className="glass-card w-full max-w-xl flex flex-col items-center relative p-8"
-        initial={{ scale: 0.9, y: 40, opacity: 0 }}
+        className="glass-card w-full max-w-xl flex flex-col items-center relative p-4 sm:p-8 shadow-2xl rounded-2xl bg-opacity-80"
+        initial={{ scale: 1, y: 20, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 120 }}
+        transition={{ type: 'spring', stiffness: 120 }}
+        style={{ minHeight: '80vh', width: '100%', maxWidth: '480px' }}
       >
         <motion.div
           className="absolute -top-8 left-1/2 -translate-x-1/2 flex gap-2"
           initial={{ opacity: 0, scale: 0.7 }}
           animate={{ opacity: 1, scale: 1 }}
         >
-          <SparklesIcon className="w-10 h-10 text-pink-500 animate-pulse" />
-          <SparklesIcon className="w-10 h-10 text-purple-500 animate-pulse" />
         </motion.div>
         <motion.h1
-          className="gradient-title text-5xl mb-2"
-          initial={{ y: -30, opacity: 0 }}
+          className="gradient-title text-2xl sm:text-3xl mb-2 text-center"
+          initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
         >
-          Ultimate Creative Battle
+          Rock Paper Scissors Ultimate
         </motion.h1>
         <motion.p
-          className="mb-6 text-lg text-gray-300"
+          className="mt-6 mb-8 text-base sm:text-lg text-gray-300 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
           Input anything. Next, try to input something that beats your previous move.<br />
-          <span className="text-pink-400 font-bold">The AI will judge your creativity!</span>
         </motion.p>
 
         <AnimatePresence>
           {!gameOver && (
             <motion.form
               onSubmit={handleSubmit}
-              className="mb-6 w-full flex justify-center gap-2"
+              className="mb-6 w-full flex flex-col sm:flex-row justify-center gap-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
@@ -127,17 +117,18 @@ export default function RockPaperScissors() {
                 type="text"
                 value={userMove}
                 onChange={e => setUserMove(e.target.value)}
-                className="glass-input w-64 animate-[wiggle_1.5s_ease-in-out_infinite]"
+                className="glass-input w-full sm:w-64 animate-none"
                 placeholder={moves.length === 0 ? "Start with any move!" : `Your move to beat \"${moves[moves.length-1]}\"`}
                 disabled={inputDisabled}
-                whileFocus={{ scale: 1.05 }}
+                whileFocus={{ scale: 1.03 }}
               />
               <motion.button
                 type="submit"
-                className="gradient-btn animate-[bounce_1.2s_infinite]"
+                className="gradient-btn"
                 disabled={inputDisabled}
-                whileHover={{ scale: 1.12, rotate: 2 }}
-                whileTap={{ scale: 0.97 }}
+                style={{ cursor: inputDisabled ? 'not-allowed' : 'pointer' }}
+                whileHover={{ scale: 1.05, rotate: 1 }}
+                whileTap={{ scale: 0.98 }}
               >
                 Submit
               </motion.button>
@@ -190,9 +181,10 @@ export default function RockPaperScissors() {
               </motion.p>
               <motion.button
                 onClick={resetGame}
-                className="mt-4 px-6 py-3 bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-800 hover:to-gray-950 text-white rounded-xl font-bold shadow-lg animate-[bounce_1.2s_infinite]"
-                whileHover={{ scale: 1.07, rotate: -2 }}
-                whileTap={{ scale: 0.97 }}
+                className="mt-4 px-6 py-3 bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-800 hover:to-gray-950 text-white rounded-xl font-bold shadow-lg"
+                style={{ cursor: 'pointer' }}
+                whileHover={{ scale: 1.03, rotate: -1 }}
+                whileTap={{ scale: 0.98 }}
               >
                 Play Again
               </motion.button>
@@ -206,7 +198,7 @@ export default function RockPaperScissors() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <h2 className="gradient-title font-bold mb-3 text-xl">Move History</h2>
+          <h2 className="gradient-title font-bold mb-3 text-xl text-center">Move History</h2>
           <ul className="list-none pl-0">
             <AnimatePresence>
               {moves.map((move, i) => (
@@ -231,10 +223,6 @@ export default function RockPaperScissors() {
           0%, 100% { transform: rotate(-2deg); }
           50% { transform: rotate(2deg); }
         }
-        @keyframes bounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
-        }
         @keyframes tada {
           0% { transform: scale(1); }
           10%, 20% { transform: scale(0.9) rotate(-3deg); }
@@ -252,8 +240,17 @@ export default function RockPaperScissors() {
           from { opacity: 0; }
           to { opacity: 1; }
         }
+        .glass-card {
+          background: rgba(30, 30, 40, 0.85);
+          border-radius: 1.5rem;
+          box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+          backdrop-filter: blur(8px);
+        }
+        .gradient-btn {
+          cursor: pointer !important;
+        }
       `}</style>
-    </motion.div>
+  </>
   );
 }
 

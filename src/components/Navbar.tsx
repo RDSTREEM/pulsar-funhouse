@@ -29,7 +29,7 @@ export default function Navbar({ streak }: NavbarProps) {
   }
 
   return (
-    <nav className="glass-nav">
+    <nav className="glass-nav absolute top-0 left-0 w-full z-50 flex items-center justify-between px-8 py-4 shadow-lg backdrop-blur-lg pointer-events-auto">
       <Link href="/" className="gradient-title text-3xl animate-[tada_1.2s]">
         Pulsar
       </Link>
@@ -57,6 +57,6 @@ export default function Navbar({ streak }: NavbarProps) {
           </>
         )}
       </div>
-    </nav>
+  </nav>
   );
 }

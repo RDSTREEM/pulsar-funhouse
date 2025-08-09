@@ -1,0 +1,90 @@
+Pulsar Funhouse Manual Testing Checklist
+=====================================
+
+General
+-------
+- App loads without errors
+- Navigation bar works and links to all games/pages
+- Login and Signup pages function correctly
+- Leaderboards page displays scores and updates
+
+Games
+-----
+1. Flappy Bird
+   - Game loads and assets display
+   - Controls respond (flap/jump)
+   - Score increases correctly
+   - Game over triggers and resets
+   - Sound and animation work
+
+2. Gebeta
+   - Game board renders
+   - Pieces move according to rules
+   - Win/loss detection
+   - Score updates
+
+3. Kareoke
+   - Page loads
+   - Audio/lyrics display (if applicable)
+   - User interaction works
+
+4. Maths Duel
+   - Math questions generate
+   - Answer input works
+   - Score and timer function
+   - Win/loss detection
+
+5. Pictonary
+   - Drawing canvas loads
+   - User can draw
+   - Guessing mechanism works
+   - Score updates
+
+6. Rock Paper Scissors
+   - Game loads
+   - User can select rock/paper/scissors
+   - Opponent selection works
+   - Win/loss/tie detection
+   - Score updates
+
+7. Tic Tac Toe
+   - Board renders
+   - User can place X/O
+   - Win/tie detection
+   - Score updates
+
+8. Two Cars
+   - Game loads
+   - Controls respond
+   - Collision detection
+   - Score updates
+
+9. Typing Test
+   - Test loads
+   - Typing input works
+   - Timer and score function
+   - Results display
+
+Other Features
+--------------
+- Daily Section displays correctly
+- GameCard component shows correct info
+- Supabase integration (if used) works for scores/auth
+- CSS/styles load for all games
+- Responsive design (mobile/desktop)
+- No console errors
+
+Manual Testing Steps
+--------------------
+- Test each game for basic playability and edge cases
+- Try invalid inputs and check error handling
+- Test login/signup with valid and invalid credentials
+- Check leaderboard updates after playing games
+- Test navigation between all pages
+- Check for broken images/assets
+- Test on different browsers/devices if possible
+
+Notes
+-----
+- Mark each item as PASS/FAIL after testing
+- Add any bugs or issues found
