@@ -1,5 +1,6 @@
 import "./globals.css";
 import Navbar from "../components/Navbar";
+import MouseTrail from "../components/MouseTrail";
 import ClientWrapper from "@/components/ClientWrapper";
 
 export const metadata = {
@@ -10,6 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="bg-gray-950">
+  {/* <MouseTrail /> */}
         <ClientWrapper>{children}</ClientWrapper>
       </body>
     </html>

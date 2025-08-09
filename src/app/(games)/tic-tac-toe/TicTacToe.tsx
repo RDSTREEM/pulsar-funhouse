@@ -20,7 +20,6 @@ function TicTacToe() {
 
   useEffect(() => {
     if (winner && user) {
-      // Only count streak for logged-in user playing as X
       if (winner === "X") {
   }
       setLastWinner(winner);

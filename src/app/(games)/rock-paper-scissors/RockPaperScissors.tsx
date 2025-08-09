@@ -74,7 +74,12 @@ export default function RockPaperScissors() {
   }
 
   return (
-    <>
+    <motion.div
+      className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-950"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <motion.div
         className="glass-card w-full max-w-xl flex flex-col items-center relative p-4 sm:p-8 shadow-2xl rounded-2xl bg-opacity-80"
         initial={{ scale: 1, y: 20, opacity: 0 }}
@@ -102,6 +107,7 @@ export default function RockPaperScissors() {
           transition={{ delay: 0.2 }}
         >
           Input anything. Next, try to input something that beats your previous move.<br />
+
         </motion.p>
 
         <AnimatePresence>
@@ -250,7 +256,7 @@ export default function RockPaperScissors() {
           cursor: pointer !important;
         }
       `}</style>
-  </>
+  </motion.div>
   );
 }
 

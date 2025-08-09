@@ -7,7 +7,7 @@ const RockPaperScissors = dynamic(() => import("./RockPaperScissors"), {
 
 export default function RockPaperScissorsPage() {
   return (
-    <main className="min-h-screen flex items-center justify-center p-8">
+    <main className="min-h-screen flex items-center justify-center">
       <RockPaperScissors />
     </main>
   );
