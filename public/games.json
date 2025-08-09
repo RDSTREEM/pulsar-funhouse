@@ -49,5 +49,10 @@
     "slug": "two-cars",
     "description": "Sing along to your favorite songs",
     "url": "/two-cars"
+  },{
+    "name":"Flappy-bird",
+    "slug":"flappy-bird",
+    "description":"A simple flappy bird game",
+    "url":"/flappy_bird"
   }
 ]

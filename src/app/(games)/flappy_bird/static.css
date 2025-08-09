@@ -1,0 +1,6 @@
+.flappy-game {
+  outline: none;
+}
+.pipe {
+  box-shadow: 0 2px 8px #0002;
+}
