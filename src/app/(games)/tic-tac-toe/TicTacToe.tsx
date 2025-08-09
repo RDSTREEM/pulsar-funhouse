@@ -1,20 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { submitWinStreak } from "@/lib/utils/submitWinStreak";
+import type { User } from "@supabase/supabase-js";
 import "@/../public/assets/tic-tac-toe/style.css";
 
-export default function TicTacToe() {
+function TicTacToe() {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isXNext, setIsXNext] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [winStreak, setWinStreak] = useState(0);
+  const [lastWinner, setLastWinner] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+  }, []);
 
   const winner = calculateWinner(board);
 
+  useEffect(() => {
+    if (winner && user) {
+      // Only count streak for logged-in user playing as X
+      if (winner === "X") {
+        if (lastWinner === "X") {
+          setWinStreak((prev) => prev + 1);
+        } else {
+          setWinStreak(1);
+        }
+        submitWinStreak("tic-tac-toe", user, winStreak + 1);
+      } else {
+        setWinStreak(0);
+      }
+      setLastWinner(winner);
+    }
+    if (!winner && board.every(Boolean)) {
+      setWinStreak(0);
+      setLastWinner(null);
+    }
+  }, [winner, user]);
+
   function handleClick(index: number) {
     if (board[index] || winner) return;
-
     const newBoard = board.slice();
     newBoard[index] = isXNext ? "X" : "O";
-
     setBoard(newBoard);
     setIsXNext(!isXNext);
   }
@@ -41,6 +70,9 @@ export default function TicTacToe() {
           ? "It's a draw!"
           : `Turn: ${isXNext ? "X" : "O"}`}
       </div>
+      {user && (
+        <div className="mt-2 text-blue-600">Your win streak: {winStreak}</div>
+      )}
       <button
         className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
         onClick={resetGame}
@@ -69,3 +101,5 @@ function calculateWinner(squares: string[]) {
   }
   return null;
 }
+
+export default TicTacToe;

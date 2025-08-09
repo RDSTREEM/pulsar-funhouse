@@ -91,6 +91,7 @@ export default function Home() {
     }
 
     return () => cleanupSubscriptions()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inQueue, user])
 
   async function checkIfInGame(gameId: string) {
@@ -105,7 +106,7 @@ export default function Home() {
       setGame({ id: gameId })
       setGameStatus('active')
       loadPlayers(gameId)
-      startNewQuestion(gameId)
+      startNewQuestion()
     }
   }
 
@@ -197,13 +198,13 @@ export default function Home() {
         setGame(gameData)
         setGameStatus('active')
         loadPlayers(gameData.id)
-        startNewQuestion(gameData.id)
+        startNewQuestion()
         setInQueue(false)
       }
     }
   }
 
-  function startNewQuestion(gameId: string) {
+  function startNewQuestion() {
     const q = generateMathQuestion(difficulty)
     setQuestion(q)
     setInput('')
@@ -225,7 +226,7 @@ export default function Home() {
 
       if (game) loadPlayers(game.id)
 
-      if (game) startNewQuestion(game.id)
+      if (game) startNewQuestion()
     } else {
       alert('Wrong answer, try again.')
     }
@@ -358,6 +359,13 @@ export default function Home() {
             onClick={async () => {
               if (user && game) {
                 await supabase.from('players').delete().eq('user_id', user.id).eq('game_id', game.id)
+                // Submit best score to leaderboard
+                const { submitScore } = await import("@/lib/utils/submitScore");
+                const supabaseSession = await supabase.auth.getSession();
+                const supabaseUser = supabaseSession.data.session?.user;
+                if (supabaseUser) {
+                  await submitScore("maths-duel", supabaseUser, score);
+                }
                 setGame(null)
                 setPlayers([])
                 setQuestion(null)

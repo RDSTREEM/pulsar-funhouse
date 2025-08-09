@@ -1,6 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { submitWinStreak } from "@/lib/utils/submitWinStreak";
+import type { User } from "@supabase/supabase-js";
 
 const choices = ["Rock", "Paper", "Scissors"] as const;
 type Choice = typeof choices[number];
@@ -24,12 +27,30 @@ export default function RockPaperScissors() {
   const [playerChoice, setPlayerChoice] = useState<Choice | null>(null);
   const [cpuChoice, setCpuChoice] = useState<Choice | null>(null);
   const [result, setResult] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [winStreak, setWinStreak] = useState(0);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+  }, []);
 
   function handleClick(choice: Choice) {
     const cpu = getRandomChoice();
     setPlayerChoice(choice);
     setCpuChoice(cpu);
-    setResult(getResult(choice, cpu));
+    const res = getResult(choice, cpu);
+    setResult(res);
+    if (user) {
+      if (res === "You win!") {
+        setWinStreak((prev) => {
+          const newStreak = prev + 1;
+          submitWinStreak("rock-paper-scissors", user, newStreak);
+          return newStreak;
+        });
+      } else {
+        setWinStreak(0);
+      }
+    }
   }
 
   function reset() {
@@ -65,6 +86,9 @@ export default function RockPaperScissors() {
             Play Again
           </button>
         </div>
+      )}
+      {user && (
+        <div className="mt-2 text-blue-600">Your win streak: {winStreak}</div>
       )}
     </div>
   );
