@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import @/../public/assets/typing-test/style.css";
+import "@/../public/assets/typing-test/style.css";
 import { calculateAccuracy, calculateWPM } from "@/lib/typingHelpers";
 
 const sampleText = "The quick brown fox jumps over the lazy dog.";
