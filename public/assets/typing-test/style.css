@@ -1,0 +1,54 @@
+.typing-test-container {
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  background: #f8f8f8;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.sample-text {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  user-select: none;
+}
+
+.typing-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1.1rem;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.typing-input:focus {
+  border-color: #0070f3;
+}
+
+.results {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+}
+
+.reset-btn {
+  margin-top: 1rem;
+  padding: 8px 16px;
+  background-color: #0070f3;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.reset-btn:hover {
+  background-color: #005bb5;
+}
