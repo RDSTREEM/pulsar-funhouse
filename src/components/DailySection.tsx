@@ -1,30 +1,38 @@
 import React, { useState, useEffect } from "react";
 
-const facts = [
-  "Honey never spoils.",
-  "Bananas are berries, but strawberries aren't.",
-  "A group of flamingos is called a 'flamboyance'.",
-];
-const quotes = [
-  "The best way to get started is to quit talking and begin doing. - Walt Disney",
-  "Success is not in what you have, but who you are. - Bo Bennett",
-  "The only limit to our realization of tomorrow is our doubts of today. - FDR",
-];
-const riddles = [
-  {
-    question: "What has keys but can't open locks?",
-    answer: "A piano",
-  },
-  {
-    question: "What comes once in a minute, twice in a moment, but never in a thousand years?",
-    answer: "The letter M",
-  },
-];
+const GEMINI_API = `${process.env.NEXT_PUBLIC_GEMINI_API_URL}=${process.env.NEXT_PUBLIC_GEMINI_API_KEY}`;
 
-function getDailyIndex() {
-  // Use date to get a daily index
-  const today = new Date();
-  return today.getDate() % 3;
+async function fetchGeminiContent() {
+  const prompt = `Respond ONLY with a valid JSON object (no markdown, no code block, no explanation). The object should have three fields: fact, quote, and riddle. The riddle should be an object with question and answer fields. Example: {"fact": "...", "quote": "...", "riddle": {"question": "...", "answer": "..."}}. Make them fun and unique for today.`;
+  const body = {
+    contents: [{ parts: [{ text: prompt }] }]
+  };
+  if (!GEMINI_API) {
+    throw new Error("GEMINI_API environment variable is not defined.");
+  }
+  const res = await fetch(GEMINI_API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  console.log('Gemini raw response:', data);
+  try {
+    let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (text.startsWith('```json')) {
+      text = text.replace(/^```json\s*/, '').replace(/```$/, '').trim();
+    } else if (text.startsWith('```')) {
+      text = text.replace(/^```\s*/, '').replace(/```$/, '').trim();
+    }
+    const json = JSON.parse(text);
+    return json;
+  } catch {
+    return {
+      fact: "Could not fetch fact.",
+      quote: "Could not fetch quote.",
+      riddle: { question: "Could not fetch riddle.", answer: "" }
+    };
+  }
 }
 
 interface DailySectionProps {
@@ -40,9 +48,11 @@ export default function DailySection({ streak, onPuzzleSolved }: DailySectionPro
   const [solved, setSolved] = useState(false);
 
   useEffect(() => {
-    setFact(facts[getDailyIndex()]);
-    setQuote(quotes[getDailyIndex()]);
-    setPuzzle({ type: "riddle", ...riddles[getDailyIndex()] });
+    fetchGeminiContent().then((json) => {
+      setFact(json.fact);
+      setQuote(json.quote);
+      setPuzzle({ type: "riddle", ...json.riddle });
+    });
   }, []);
 
   function checkAnswer() {
@@ -55,9 +65,9 @@ export default function DailySection({ streak, onPuzzleSolved }: DailySectionPro
   return (
     <section className="bg-gray-800 rounded-lg p-6 mb-8 w-full max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold text-white mb-4">Daily</h2>
-      <div className="mb-2 text-gray-300">Fact: {fact}</div>
-      <div className="mb-2 text-gray-300">Quote: {quote}</div>
-      <div className="mb-2 text-gray-300">Puzzle: {puzzle.question}</div>
+      <div className="mb-2 text-gray-300">Fact: {fact || <span className="italic text-gray-500">Loading...</span>}</div>
+      <div className="mb-2 text-gray-300">Quote: {quote || <span className="italic text-gray-500">Loading...</span>}</div>
+      <div className="mb-2 text-gray-300">Puzzle: {puzzle.question || <span className="italic text-gray-500">Loading...</span>}</div>
       {!solved ? (
         <div className="flex gap-2 mt-2">
           <input
@@ -66,10 +76,12 @@ export default function DailySection({ streak, onPuzzleSolved }: DailySectionPro
             value={userAnswer}
             onChange={(e) => setUserAnswer(e.target.value)}
             placeholder="Your answer"
+            disabled={!puzzle.question}
           />
           <button
             className="bg-blue-500 text-white px-3 py-1 rounded"
             onClick={checkAnswer}
+            disabled={!puzzle.question}
           >
             Submit
           </button>
