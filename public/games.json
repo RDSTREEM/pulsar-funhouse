@@ -36,5 +36,10 @@
     "description": "Draw while the rest try to guess",
     "url": "/pictonary",
     "badge": "Requires Login"
+  },{
+    "name":"Flappy Bird",
+    "slug":"flappy_bird",
+    "description":"Fly through the pipes and avoid obstacles",
+    "url":"/flappy_bird"
   }
 ]
