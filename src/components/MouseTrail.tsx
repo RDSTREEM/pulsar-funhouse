@@ -48,7 +48,7 @@ const MouseTrail: React.FC = () => {
       {Array.from({ length: NUM_CIRCLES }).map((_, i) => (
         <div
           key={i}
-          ref={el => circlesRef.current[i] = el}
+          ref={el => { circlesRef.current[i] = el; }}
           style={{
             position: "fixed",
             top: 0,

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { submitWinStreak } from "@/lib/utils/submitWinStreak";
+// ...existing code...
 import type { User } from "@supabase/supabase-js";
 import "@/../public/assets/tic-tac-toe/style.css";
 
@@ -10,7 +10,7 @@ function TicTacToe() {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isXNext, setIsXNext] = useState(true);
   const [user, setUser] = useState<User | null>(null);
-  const [lastWinner, setLastWinner] = useState<string | null>(null);
+// ...existing code...
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -22,12 +22,12 @@ function TicTacToe() {
     if (winner && user) {
       if (winner === "X") {
   }
-      setLastWinner(winner);
+  // ...existing code...
     }
     if (!winner && board.every(Boolean)) {
-      setLastWinner(null);
+  // ...existing code...
     }
-  }, [winner, user]);
+  }, [winner, user, board]);
 
   function handleClick(index: number) {
     if (board[index] || winner) return;
@@ -46,7 +46,7 @@ function TicTacToe() {
     <div className="text-center w-full">
       <h1 className="gradient-title text-4xl mb-6">Tic Tac Toe</h1>
       <div className="mb-2 text-sm max-w-md mx-auto">
-        <strong>How to Play:</strong> Two players take turns marking empty squares on a 3x3 grid, one as X and one as O. The first to get three in a row (horizontally, vertically, or diagonally) wins. If all squares are filled and no one has three in a row, it's a draw.
+  <strong>How to Play:</strong> Two players take turns marking empty squares on a 3x3 grid, one as X and one as O. The first to get three in a row (horizontally, vertically, or diagonally) wins. If all squares are filled and no one has three in a row, it&apos;s a draw.
       </div>
       <div className="grid grid-cols-3 gap-2 justify-center items-center mx-auto mb-6 w-64">
         {board.map((cell, i) => (
@@ -63,7 +63,7 @@ function TicTacToe() {
         {winner
           ? `Winner: ${winner}`
           : board.every(Boolean)
-          ? "It's a draw!"
+          ? "It&apos;s a draw!"
           : `Turn: ${isXNext ? "X" : "O"}`}
       </div>
       <button

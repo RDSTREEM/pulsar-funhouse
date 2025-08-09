@@ -91,8 +91,8 @@ function KaraokePage() {
       if (!data.recordings || data.recordings.length === 0) {
         setError('No songs found.');
       }
-    } catch (e) {
-      setError('Error searching songs.');
+    } catch {
+  setError('Error searching songs.');
     }
     setSearchLoading(false);
   };
@@ -110,7 +110,7 @@ function KaraokePage() {
       }
       setLyrics(data.lyrics || 'Lyrics not found');
       if (!data.lyrics) setError('Lyrics not found.');
-    } catch (e) {
+    } catch {
       setLyrics('Lyrics not found');
       setError('Error fetching lyrics.');
     }

@@ -1,11 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-async function fetchRandomUser(): Promise<{ email: string } | null> {
-  // TODO: Add Supabase logic to fetch a random user (excluding current user) lol
-  // Hope ya luck
-  return null;
-}
 
 const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 const GEMINI_API_URL = process.env.NEXT_PUBLIC_GEMINI_API_URL;
@@ -27,7 +22,7 @@ async function sendGeminiMessage(message: string) {
       return `Error: ${res.status} ${res.statusText}`;
     }
     const data = await res.json();
-    let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     if (text) {
       return text;
     }
@@ -72,7 +67,7 @@ export default function TruthOrTechGame() {
   function handleDecision(ai: string, notAi: string) {
     let losePoint = false;
     // If user guesses wrong (Gemini is not AI) or is chosen as AI
-    if (ai === "You" || ai !== opponentName) {
+  if (ai === "You" || ai !== opponentName) { 
       losePoint = true;
     }
     if (losePoint) {
@@ -87,7 +82,6 @@ export default function TruthOrTechGame() {
     setStage('waiting');
     setTimeout(() => {
       if (!gameOver && points > 1) {
-        setStage('idle');
         setMessages([]);
         setInput("");
       }

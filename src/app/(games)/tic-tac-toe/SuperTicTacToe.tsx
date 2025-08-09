@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 // Ultimate Tic Tac Toe: 3x3 grid of 3x3 boards
-const BOARD_SIZE = 3;
+// ...existing code...
 
 function calculateWinner(squares: string[]): string | null {
   const lines = [
@@ -95,7 +95,7 @@ export default function SuperTicTacToe() {
       <div className="mt-4 text-md">
         {bigWinner ? `Winner: ${bigWinner}` : `Turn: ${isXNext ? "X" : "O"}`}
       </div>
-      <div className="mt-2 text-xs text-gray-500">Your move determines your opponent's next board!</div>
+  <div className="mt-2 text-xs text-gray-500">Your move determines your opponent&apos;s next board!</div>
     </div>
   );
 }

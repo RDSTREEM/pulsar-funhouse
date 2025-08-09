@@ -41,10 +41,6 @@ function sideEmpty(b: number[], player: number) {
 export default function GebetaBoard() {
 
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [inQueue, setInQueue] = useState<boolean>(false);
-  const [game, setGame] = useState<Game | null>(null);
-  const [players, setPlayers] = useState<Player[]>([]);
   const [board, setBoard] = useState<number[]>(newBoard());
   const [scores, setScores] = useState<[number, number]>([0, 0]);
   const [current, setCurrent] = useState(0);
@@ -55,25 +51,11 @@ export default function GebetaBoard() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setUser(data.session?.user ?? null);
-      setLoading(false);
+  // ...existing code...
     });
   }, []);
 
-  async function enterQueue() {
-    if (!user) return;
-    const { error } = await supabase.from('matchmaking_queue').insert([
-      {
-        user_id: user.id,
-        username: user.email || user.id,
-      },
-    ]);
-    if (error) {
-      alert('Error entering matchmaking queue: ' + error.message);
-      return;
-    }
-    setInQueue(true);
-    // TODO: Add matchmaking logic here
-  }
+  // ...existing code...
 
   function reset() {
     setBoard(newBoard());
@@ -83,8 +65,8 @@ export default function GebetaBoard() {
   }
 
   async function animateMove(pitIndex: number) {
-    let b = [...board];
-    let stones = b[pitIndex];
+    const b = [...board];
+    const stones = b[pitIndex];
     b[pitIndex] = 0;
     let idx = pitIndex;
     for (let i = 0; i < stones; i++) {
@@ -189,7 +171,7 @@ export default function GebetaBoard() {
         <ul className="list-disc pl-5 text-sm">
           <li>Each player owns one row of pits. Players take turns picking a pit from their row.</li>
           <li>Pick a pit with pebbles to distribute them one by one counterclockwise.</li>
-          <li>If your last pebble lands in the opponent's pit with 2 or 3 pebbles, you capture those pebbles.</li>
+          <li>If your last pebble lands in the opponents pit with 2 or 3 pebbles, you capture those pebbles.</li>
           <li>The game ends when one side is empty. Remaining pebbles go to their owners.</li>
           <li>Highest score wins!</li>
         </ul>

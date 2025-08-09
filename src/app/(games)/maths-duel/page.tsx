@@ -375,7 +375,7 @@ export default function Home() {
             >
               Leave Game
             </button>
-  {/* @ts-ignore */}
+  {/* @ts-expect-error: Suppressing type error for winner rendering logic */}
   {gameStatus === 'finished' && winner && (
           <div className="glass-section flex flex-col items-center mt-4 p-6 w-full max-w-md">
             <h3 className="gradient-title text-xl mb-4">Game Over!</h3>

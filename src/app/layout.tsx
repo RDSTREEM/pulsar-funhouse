@@ -1,6 +1,5 @@
 import "./globals.css";
-import Navbar from "../components/Navbar";
-import MouseTrail from "../components/MouseTrail";
+// Removed unused imports
 import ClientWrapper from "@/components/ClientWrapper";
 
 export const metadata = {

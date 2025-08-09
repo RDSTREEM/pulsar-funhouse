@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 
 
@@ -78,6 +78,47 @@ export default function Pictionary() {
   }, []);
 
 
+
+  const loadPlayers = useCallback(async () => {
+    if (!room) return;
+    const { data } = await supabase.from('drawing_players').select().eq('room_id', room.id);
+    setPlayers(data || []);
+  }, [room]);
+
+  const loadChat = useCallback(async () => {
+    if (!room) return;
+    const { data } = await supabase.from('drawing_chat').select().eq('room_id', room.id).order('created_at');
+    setChatMessages(data || []);
+  }, [room]);
+
+  const loadDrawingActions = useCallback(async () => {
+    if (!room) return;
+    const { data } = await supabase.from('drawing_actions').select().eq('room_id', room.id).order('created_at');
+    setDrawingActions((data || []).map((d: { action: DrawingAction }) => d.action));
+  }, [room]);
+
+  const redraw = useCallback(() => {
+    const ctx = ctxRef.current;
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, 600, 400);
+    drawingActions.forEach((action) => {
+      if (action.type === 'stroke') {
+        ctx.strokeStyle = action.color;
+        ctx.lineWidth = action.lineWidth || 4;
+        ctx.beginPath();
+        action.points.forEach(({ x, y }, i) => {
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        });
+        ctx.stroke();
+      }
+    });
+  }, [drawingActions]);
+
   useEffect(() => {
     if (!room) return;
 
@@ -107,25 +148,6 @@ export default function Pictionary() {
       if (subscriptionRef.current) supabase.removeChannel(subscriptionRef.current);
     };
   }, [room, user, loadPlayers, loadChat, loadDrawingActions]);
-
-
-  async function loadPlayers() {
-    if (!room) return;
-    const { data } = await supabase.from('drawing_players').select().eq('room_id', room.id);
-    setPlayers(data || []);
-  }
-
-  async function loadChat() {
-    if (!room) return;
-    const { data } = await supabase.from('drawing_chat').select().eq('room_id', room.id).order('created_at');
-    setChatMessages(data || []);
-  }
-
-  async function loadDrawingActions() {
-    if (!room) return;
-    const { data } = await supabase.from('drawing_actions').select().eq('room_id', room.id).order('created_at');
-    setDrawingActions((data || []).map((d: { action: DrawingAction }) => d.action));
-  }
 
   // Create a room
 
@@ -191,24 +213,7 @@ export default function Pictionary() {
   }, [drawingActions, redraw]);
 
 
-  function redraw() {
-    const ctx = ctxRef.current;
-    if (!ctx) return;
-
-    ctx.clearRect(0, 0, 600, 400);
-    drawingActions.forEach((action) => {
-      if (action.type === 'stroke') {
-        ctx.strokeStyle = action.color;
-        ctx.lineWidth = action.lineWidth || 4;
-        ctx.beginPath();
-        action.points.forEach(({ x, y }, i) => {
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        });
-        ctx.stroke();
-      }
-    });
-  }
+  // ...existing code...
 
 
   function handleMouseDown(e: React.MouseEvent<HTMLCanvasElement>) {

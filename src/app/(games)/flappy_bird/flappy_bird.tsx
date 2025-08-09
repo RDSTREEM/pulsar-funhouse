@@ -1,5 +1,6 @@
 'use client';
 import React, { useRef, useEffect, useState } from 'react';
+import Image from 'next/image';
 
 const BIRD_WIDTH = 40;
 const BIRD_HEIGHT = 30;
@@ -104,9 +105,11 @@ const FlappyBird: React.FC = () => {
       }}
     >
       {/* Bird */}
-      <img
+      <Image
         src={birdUrl}
         alt="bird"
+        width={BIRD_WIDTH}
+        height={BIRD_HEIGHT}
         style={{
           position: 'absolute',
           left: 60,
