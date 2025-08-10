@@ -49,6 +49,14 @@ export default function Navbar({ streak }: NavbarProps) {
       <div
         className={`flex-col sm:flex-row flex items-center gap-4 sm:gap-6 absolute sm:static top-full left-0 w-full sm:w-auto bg-gray-900/95 sm:bg-transparent px-4 sm:px-0 py-4 sm:py-0 shadow-lg sm:shadow-none transition-all duration-300 z-40 ${menuOpen ? 'flex' : 'hidden sm:flex'}`}
       >
+        <Link href="/leaderboard" className="px-4 py-2 rounded-xl bg-purple-900/40 text-purple-300 font-bold hover:bg-purple-900/70 transition-colors shadow-lg">
+          Leaderboard
+        </Link>
+        {user && (
+          <Link href={`/profile/${user.id}`} className="px-4 py-2 rounded-xl bg-green-900/40 text-green-300 font-bold hover:bg-green-900/70 transition-colors shadow-lg">
+            Profile
+          </Link>
+        )}
         {user ? (
           <>
             <span className="text-base text-gray-300 font-medium flex items-center gap-2">

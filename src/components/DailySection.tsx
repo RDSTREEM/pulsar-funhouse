@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { getOrCreateDaily } from "@/lib/utils/dailySupabase";
 
 const GEMINI_API = `${process.env.NEXT_PUBLIC_GEMINI_API_URL}=${process.env.NEXT_PUBLIC_GEMINI_API_KEY}`;
 
@@ -44,15 +45,19 @@ export default function DailySection({ streak, onPuzzleSolved }: DailySectionPro
   const [fact, setFact] = useState("");
   const [quote, setQuote] = useState("");
   const [puzzle, setPuzzle] = useState({ type: "riddle", question: "", answer: "" });
+  const [loading, setLoading] = useState(true);
   const [userAnswer, setUserAnswer] = useState("");
   const [solved, setSolved] = useState(false);
 
   useEffect(() => {
-    fetchGeminiContent().then((json) => {
-      setFact(json.fact);
-      setQuote(json.quote);
-      setPuzzle({ type: "riddle", ...json.riddle });
-    });
+    const today = new Date().toISOString().slice(0, 10);
+    getOrCreateDaily(today, fetchGeminiContent)
+      .then((daily) => {
+        setFact(daily.fact);
+        setQuote(daily.quote);
+        setPuzzle({ type: "riddle", question: daily.riddle_question, answer: daily.riddle_answer });
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   function checkAnswer() {
@@ -65,10 +70,10 @@ export default function DailySection({ streak, onPuzzleSolved }: DailySectionPro
   return (
     <section className="glass-section mb-8 w-full max-w-2xl mx-auto p-6">
       <h2 className="gradient-title text-2xl mb-4">Daily</h2>
-      <div className="mb-2 text-gray-300">Fact: {fact || <span className="italic text-gray-500">Loading...</span>}</div>
-      <div className="mb-2 text-gray-300">Quote: {quote || <span className="italic text-gray-500">Loading...</span>}</div>
-      <div className="mb-2 text-gray-300">Puzzle: {puzzle.question || <span className="italic text-gray-500">Loading...</span>}</div>
-      {!solved ? (
+      <div className="mb-2 text-gray-300">Fact: {loading ? <span className="italic text-gray-500">Loading...</span> : fact}</div>
+      <div className="mb-2 text-gray-300">Quote: {loading ? <span className="italic text-gray-500">Loading...</span> : quote}</div>
+      <div className="mb-2 text-gray-300">Puzzle: {loading ? <span className="italic text-gray-500">Loading...</span> : puzzle.question}</div>
+      {!solved && !loading ? (
         <div className="flex gap-2 mt-2">
           <input
             type="text"
@@ -86,9 +91,9 @@ export default function DailySection({ streak, onPuzzleSolved }: DailySectionPro
             Submit
           </button>
         </div>
-      ) : (
+      ) : solved ? (
         <div className="text-green-400 mt-2">Correct! Streak: {streak}</div>
-      )}
+      ) : null}
     </section>
   );
 }

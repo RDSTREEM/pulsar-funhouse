@@ -50,7 +50,7 @@ body {
   @apply mt-8 text-left w-full;
 }
 .glass-main {
-  @apply min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 px-4 py-8 relative overflow-x-hidden;
+  @apply min-h-screen flex flex-col items-center justify-center px-4 py-8 relative overflow-x-hidden;
 }
 .glass-nav {
   @apply flex items-center justify-between px-8 py-4 bg-gray-900/80 backdrop-blur-xl border-b-2 border-purple-700/40 shadow-lg z-20;
