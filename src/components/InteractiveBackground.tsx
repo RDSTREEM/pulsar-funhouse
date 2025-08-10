@@ -73,10 +73,11 @@ const InteractiveBackground: React.FC<{ children?: React.ReactNode }> = ({ child
         p.y += p.vy + (Math.random() - 0.5) * 1.5;
         p.life--;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 12, 0, Math.PI * 2); // Larger particles
-        ctx.fillStyle = `rgba(255,255,255,${Math.max(0, p.life / 100)})`;
-        ctx.shadowColor = '#fff';
-        ctx.shadowBlur = 16;
+        ctx.arc(p.x, p.y, 10, 0, Math.PI * 3); // Slightly smaller particles
+        // Blend color with background gradient
+        ctx.fillStyle = `rgba(60, 70, 120, ${Math.max(0, p.life / 180)})`;
+        ctx.shadowColor = '#2a2a4e';
+        ctx.shadowBlur = 4;
         ctx.fill();
         ctx.shadowBlur = 0;
       });

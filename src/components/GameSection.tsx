@@ -18,7 +18,7 @@ interface GameSectionProps {
 const GameSection: React.FC<GameSectionProps> = ({ title, games }) => (
   <section className="mb-12 w-full">
     <h2 className="text-3xl font-bold mb-6 text-left w-full">{title}</h2>
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 w-full">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 w-full place-items-center">
       {games.map((game) => (
         <div key={game.name} className="relative">
           <GameCard
