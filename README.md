@@ -133,6 +133,7 @@ Visit [http://localhost:3000](http://localhost:3000)
 
 * Finish all in-progress games.
 * Add more creative, quirky experiences.
+* Add mobile support for currently keyboard requiring games.
 * Make **Pulsar Funhouse** *the* go-to site when you’re bored.
 
 ---
