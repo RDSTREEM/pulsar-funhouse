@@ -72,9 +72,9 @@ export default function DailySection({ streak, onPuzzleSolved }: DailySectionPro
       <h2 className="gradient-title text-2xl mb-4">Daily</h2>
       <div className="mb-2 text-gray-300">Fact: {loading ? <span className="italic text-gray-500">Loading...</span> : fact}</div>
       <div className="mb-2 text-gray-300">Quote: {loading ? <span className="italic text-gray-500">Loading...</span> : quote}</div>
-      <div className="mb-2 text-gray-300">Puzzle: {loading ? <span className="italic text-gray-500">Loading...</span> : puzzle.question}</div>
+      <div className="mt-4 mb-2 text-gray-300">Puzzle: {loading ? <span className="italic text-gray-500">Loading...</span> : puzzle.question}</div>
       {!solved && !loading ? (
-        <div className="flex gap-2 mt-2">
+        <div className="flex gap-2 mt-2 flex-col md:flex-row">
           <input
             type="text"
             className="glass-input"
