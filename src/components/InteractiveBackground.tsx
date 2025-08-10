@@ -16,7 +16,7 @@ const InteractiveBackground: React.FC<{ children?: React.ReactNode }> = ({ child
     canvas.width = width;
     canvas.height = height;
 
-  let mouse = { x: width / 2, y: height / 2 };
+  const mouse = { x: width / 2, y: height / 2 };
   let particles: { x: number; y: number; vx: number; vy: number; life: number }[] = [];
   let waveOffset = 0;
   const MAX_PARTICLES = 120;

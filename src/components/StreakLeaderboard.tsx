@@ -2,8 +2,15 @@
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 
+// Define the type for leaderboard entries
+type LeaderboardEntry = {
+  user_id: string;
+  username: string;
+  score: number;
+};
+
 export default function StreakLeaderboard() {
-  const [leaders, setLeaders] = useState<any[]>([]);
+  const [leaders, setLeaders] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

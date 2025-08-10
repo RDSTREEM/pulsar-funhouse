@@ -3,9 +3,18 @@ import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
+// Define a type for your profile data
+type Profile = {
+  id: string;
+  username: string;
+  streak?: number;
+  longest_streak?: number;
+  // Add other profile fields as needed
+};
+
 export default function ProfilePage() {
   const { acc } = useParams();
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [username, setUsername] = useState("");
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -40,7 +49,9 @@ export default function ProfilePage() {
       .eq("id", acc);
     setEditing(false);
     setLoading(false);
-    if (!error) setProfile((p: any) => ({ ...p, username }));
+    if (!error && profile) {
+      setProfile({ ...profile, username });
+    }
   }
 
   if (loading) return <div className="p-8">Loading...</div>;

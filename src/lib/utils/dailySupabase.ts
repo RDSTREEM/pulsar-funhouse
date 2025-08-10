@@ -1,7 +1,18 @@
 import { supabase } from "@/lib/supabase";
 
-export async function getOrCreateDaily(date: string, fetchGeminiContent: () => Promise<any>) {
-  // Try to fetch today's daily from Supabase
+type GeminiContent = {
+  fact: string;
+  quote: string;
+  riddle?: {
+    question: string;
+    answer: string;
+  };
+};
+
+export async function getOrCreateDaily(
+  date: string,
+  fetchGeminiContent: () => Promise<GeminiContent>
+) {
   const { data, error } = await supabase
     .from("daily")
     .select()
@@ -12,7 +23,6 @@ export async function getOrCreateDaily(date: string, fetchGeminiContent: () => P
     return data;
   }
 
-  // If not found, generate new content
   const gemini = await fetchGeminiContent();
   const insert = {
     date,
