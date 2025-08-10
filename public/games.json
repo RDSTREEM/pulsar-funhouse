@@ -1,63 +1,85 @@
 [
   {
-    "name": "Rock Paper Scissors",
+    "name": "AI Rock Paper Scissors",
     "slug": "rock-paper-scissors",
     "description": "Classic game with a modern UI.",
-    "url": "/rock-paper-scissors"
+    "url": "/rock-paper-scissors",
+    "image": "/assets/thumbnails/rock-paper-scissor.jpg",
+    "status": "ai"
   },
   {
-    "name": "Tic Tac Toe",
+    "name": "Tic Tac Toe and Variations",
     "slug": "tic-tac-toe",
-    "description": "Play against a friend or challenge yourself.",
-    "url": "/tic-tac-toe"
+    "description": "Play against the CPU in the popular tic-tac-toe game or its variants.",
+    "url": "/tic-tac-toe",
+    "image": "/assets/thumbnails/tic-tac-toe.png",
+    "status": "ready"
   },
   {
     "name": "Gebeta",
     "slug": "gebeta",
-    "description": "Traditional Ethiopian game",
-    "url": "/gebeta"
+    "description": "Traditional Ethiopian board game",
+    "url": "/gebeta",
+    "image": "/assets/thumbnails/gebeta.jpg",
+    "status": "ready"
   },
   {
     "name": "Typing Test",
     "slug": "typing-test",
     "description": "Test your typing speed and accuracy",
-    "url": "/typing-test"
+    "url": "/typing-test",
+    "image": "/assets/thumbnails/typing-test.jpg",
+    "status": "ready"
   },
   {
     "name": "Math Duel",
     "slug": "maths-duel",
     "description": "Race against others and see who can solve maths questions faster",
     "url": "/maths-duel",
-    "badge": "Requires Login"
+    "image": "/assets/thumbnails/math-duel.png",
+    "badge": "Requires Login",
+    "status": "in-progress"
   },
   {
     "name": "Pictonary",
     "slug": "pictonary",
     "description": "Draw while the rest try to guess",
     "url": "/pictonary",
-    "badge": "Requires Login"
+    "image": "/assets/thumbnails/pictonary.jpg",
+    "badge": "Requires Login",
+    "status": "in-progress"
   },
   {
     "name": "Karaoke",
     "slug": "karaoke",
     "description": "Sing along to your favorite songs",
     "url": "/kareoke",
-    "badge": "Requires Login"
+    "image": "/assets/thumbnails/kareoke.jpg",
+    "badge": "Requires Login",
+    "status": "in-progress"
   },
   {
     "name": "Two Cars",
     "slug": "two-cars",
-    "description": "Sing along to your favorite songs",
-    "url": "/two-cars"
-  },{
-    "name":"Flappy-bird",
-    "slug":"flappy-bird",
-    "description":"A simple flappy bird game",
-    "url":"/flappy_bird"
-  },{
-    "name":"Truth or Tech",
-    "slug":"truth_or_tech",
-    "description":"Chat, guess if AI or human, score points!",
-    "url":"/truth_or_tech"
+    "description": "A simple recreation of the mobile game Two Cars",
+    "url": "/two-cars",
+    "image": "/assets/thumbnails/two-cars.jpg",
+    "status": "ready"
+  },
+  {
+    "name": "Flappy Bird",
+    "slug": "flappy-bird",
+    "description": "A simple flappy bird game",
+    "url": "/flappy_bird",
+    "image": "/assets/thumbnails/flappy-bird.png",
+    "status": "ready"
+  },
+  {
+    "name": "Truth or Tech",
+    "slug": "truth_or_tech",
+    "description": "Chat, guess if AI or human, score points!",
+    "url": "/truth_or_tech",
+    "image": "/assets/thumbnails/truth or tech.jpg",
+    "status": "ai"
   }
 ]

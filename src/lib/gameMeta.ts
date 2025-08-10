@@ -7,14 +7,14 @@ export type GameMeta = {
 };
 
 export const gameMeta: GameMeta = {
-  "rock-paper-scissors": { status: "ready" },
+  "rock-paper-scissors": { status: "ai" },
   "tic-tac-toe": { status: "ready" },
   "gebeta": { status: "ready" },
   "typing-test": { status: "ready" },
-  "maths-duel": { status: "ready" },
+  "maths-duel": { status: "in-progress" },
   "pictonary": { status: "in-progress" },
   "karaoke": { status: "in-progress" },
-  "two-cars": { status: "in-progress" },
+  "two-cars": { status: "ready" },
   "flappy-bird": { status: "ready" },
-  "truth_or_tech": { status: "ai" }, // AI powered
+  "truth_or_tech": { status: "ai" },
 };

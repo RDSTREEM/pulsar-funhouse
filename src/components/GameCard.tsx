@@ -21,11 +21,15 @@ const GameCard: React.FC<GameCardProps> = ({ name, description, url, image, badg
         <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-pink-900/20 opacity-60 z-0" />
         <div className="relative z-20">
           {image ? (
-            <Image
-              src={image}
-              alt={name}
-              className="w-full h-32 object-cover rounded-lg mb-3 border border-gray-900"
-            />
+              <div className="relative w-full h-32 mb-3">
+                <Image
+                  src={image}
+                  alt={name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 320px"
+                  className="object-cover rounded-lg border border-gray-900"
+                />
+              </div>
           ) : (
             <div className="w-full h-32 bg-gray-900 rounded-lg mb-3 flex items-center justify-center text-gray-500 text-sm">
               No Image
